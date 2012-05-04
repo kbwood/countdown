@@ -1,5 +1,5 @@
 /* http://keith-wood.name/countdown.html
-   Countdown for jQuery v1.3.0.
+   Countdown for jQuery v1.4.0.
    Written by Keith Wood (kbwood@virginbroadband.com.au) January 2008.
    Dual licensed under the GPL (http://dev.jquery.com/browser/trunk/jquery/GPL-LICENSE.txt) and 
    MIT (http://dev.jquery.com/browser/trunk/jquery/MIT-LICENSE.txt) licenses. 
@@ -27,6 +27,7 @@ function Countdown() {
 	this._defaults = {
 		format: 'dHMS', // Format for display - upper case for always, lower case only if non-zero,
 			// 'Y' years, 'O' months, 'W' weeks, 'D' days, 'H' hours, 'M' minutes, 'S' seconds
+		layout: '', // Build your own layout for the countdown
 		compact: false, // True to display in a compact format, false for an expanded one
 		description: '', // The description displayed for the countdown
 		expiryUrl: null, // A URL to load upon expiry, replacing the current page
@@ -298,6 +299,7 @@ $.extend(Countdown.prototype, {
 			showCount += (inst._show[period] ? 1 : 0);
 		}
 		var compact = this._get(inst, 'compact');
+		var layout = this._get(inst, 'layout');
 		var labels = (compact ? this._get(inst, 'compactLabels') : this._get(inst, 'labels'));
 		var labelsSingle = (compact ? this._get(inst, 'compactLabelsSingle') :
 			this._get(inst, 'labelsSingle')) || labels;
@@ -315,8 +317,8 @@ $.extend(Countdown.prototype, {
 				periods[period] + '</span><br/>' + (periods[period] == 1 ?
 				labelsSingle[period] : labels[period]) + '</div>' : '');
 		};
-		return (compact ?
-			// Compact version
+		return (layout ? this._buildLayout(inst, layout, labels, labelsSingle) :
+			((compact ? // Compact version
 			'<div class="countdown_row countdown_amount' +
 			(inst._hold ? ' countdown_holding' : '') + '">' + 
 			showCompact(Y) + showCompact(O) + showCompact(W) + showCompact(D) + 
@@ -327,9 +329,49 @@ $.extend(Countdown.prototype, {
 			(inst._hold ? ' countdown_holding' : '') + '">' +
 			showFull(Y) + showFull(O) + showFull(W) + showFull(D) +
 			showFull(H) + showFull(M) + showFull(S)) + '</div>' +
-			(description ? '<div class="countdown_row countdown_descr">' + description + '</div>' : '');
+			(description ? '<div class="countdown_row countdown_descr">' + description + '</div>' : '')));
 	},
-	
+
+	/* Construct a custom layout.
+	   @param  inst          object - the current settings for this instance
+	   @param  layout        string - the customised layout
+	   @param  labels        string[] - the plural labels for each period
+	   @param  labelsSingle  string[] - the singular labels for each period
+	   @return  string - the custom HTML */
+	_buildLayout: function(inst, layout, labels, labelsSingle) {
+		var html = layout;
+		var processPeriod = function(period, index) {
+			var pattern1 = new RegExp('%' + period + '.*%' + period);
+			var pattern2 = new RegExp('%' + period + '.*');
+			while (true) {
+				var matches = pattern1.exec(html);
+				if (!matches) {
+					break;
+				}
+				matches[0] = matches[0].substr(0, 2) +
+					matches[0].substr(2).replace(pattern2, '%' + period);
+				html = html.replace(matches[0], inst._show[index] ?
+					customisePeriod(matches[0], period, index) : '');
+			}
+		};
+		var customisePeriod = function(text, period, index) {
+			return text.substr(2, text.length - 4).
+				replace(/%nn/g, (inst._periods[index] < 10 ? '0' : '') +
+				inst._periods[index]).
+				replace(/%n/g, inst._periods[index]).
+				replace(/%l/g, inst._periods[index] == 1 ?
+				labelsSingle[index] : labels[index]);
+		};
+		processPeriod('Y', Y);
+		processPeriod('O', O);
+		processPeriod('W', W);
+		processPeriod('D', D);
+		processPeriod('H', H);
+		processPeriod('M', M);
+		processPeriod('S', S);
+		return html;
+	},
+
 	/* Translate the format into flags for each period.
 	   @param  inst  object - the current settings for this instance
 	   @return  string[7] - flags indicating which periods are requested (?) or
