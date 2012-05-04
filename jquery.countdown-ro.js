@@ -4,6 +4,8 @@
 $(document).ready(function() {
 	$.countdown.regional['ro'] = {
 		labels: ['An', 'Luna', 'Saptamana', 'Ziua', 'Ora', 'Minutul', 'Secunda'],
-		compactLabels: ['A', 'L', 'S', 'Z'], timeSeparator: ':'};
+		labelsSingle: ['An', 'Luna', 'Saptamana', 'Ziua', 'Ora', 'Minutul', 'Secunda'],
+		compactLabels: ['A', 'L', 'S', 'Z'], compactLabelsSingle: ['A', 'L', 'S', 'Z'],
+		timeSeparator: ':'};
 	$.countdown.setDefaults($.countdown.regional['ro']);
 });

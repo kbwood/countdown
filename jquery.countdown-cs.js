@@ -4,6 +4,8 @@
 $(document).ready(function() {
 	$.countdown.regional['cs'] = {
 		labels: ['Roky', 'Měsíce', 'Týdny', 'Dny', 'Hodiny', 'Minuty', 'Sekundy'],
-		compactLabels: ['r', 'm', 't', 'd'], timeSeparator: ':'};
+		labelsSingle: ['Roky', 'Měsíce', 'Týdny', 'Dny', 'Hodiny', 'Minuty', 'Sekundy'],
+		compactLabels: ['r', 'm', 't', 'd'], compactLabelsSingle: ['r', 'm', 't', 'd'],
+		timeSeparator: ':'};
 	$.countdown.setDefaults($.countdown.regional['cs']);
 });

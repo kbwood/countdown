@@ -4,6 +4,8 @@
 $(document).ready(function() {
 	$.countdown.regional['zh-CN'] = {
 		labels: ['年', '月', '周', '天', '时', '分', '秒'],
-		compactLabels: ['年', '月', '周', '天'], timeSeparator: ':'};
+		labelsSingle: ['年', '月', '周', '天', '时', '分', '秒'],
+		compactLabels: ['年', '月', '周', '天'], compactLabelsSingle: ['年', '月', '周', '天'],
+		timeSeparator: ':'};
 	$.countdown.setDefaults($.countdown.regional['zh-CN']);
 });

@@ -4,6 +4,8 @@
 $(document).ready(function() {
 	$.countdown.regional['fr'] = {
 		labels: ['Années', 'Mois', 'Semaines', 'Jours', 'Heures', 'Minutes', 'Secondes'],
-		compactLabels: ['a', 'm', 's', 'j'], timeSeparator: ':'};
+		labelsSingle: ['Année', 'Mois', 'Semaine', 'Jour', 'Heure', 'Minute', 'Seconde'],
+		compactLabels: ['a', 'm', 's', 'j'], compactLabelsSingle: ['a', 'm', 's', 'j'],
+		timeSeparator: ':'};
 	$.countdown.setDefaults($.countdown.regional['fr']);
 });
