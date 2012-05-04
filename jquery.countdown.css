@@ -1,4 +1,4 @@
-/* jQuery Countdown styles */
+/* jQuery Countdown styles 1.5.0. */
 .hasCountdown {
 	border: 1px solid #ccc;
 	background-color: #eee;
@@ -6,42 +6,46 @@
 .countdown_rtl {
 	direction: rtl;
 }
-.countdown_holding div {
+.countdown_holding span {
 	background-color: #ccc;
 }
 .countdown_row {
 	clear: both;
 	width: 100%;
+	padding: 0px 2px;
 	text-align: center;
 }
-.countdown_show1 div {
+.countdown_show1 .countdown_section {
 	width: 100%;
 }
-.countdown_show2 div {
-	width: 50%;
+.countdown_show2 .countdown_section {
+	width: 49%;
 }
-.countdown_show3 div {
+.countdown_show3 .countdown_section {
 	width: 33%;
 }
-.countdown_show4 div {
-	width: 25%;
+.countdown_show4 .countdown_section {
+	width: 24.5%;
 }
-.countdown_show5 div {
-	width: 20%;
+.countdown_show5 .countdown_section {
+	width: 19.5%;
 }
-.countdown_show6 div {
-	width: 16%;
+.countdown_show6 .countdown_section {
+	width: 16.5%;
 }
-.countdown_show7 div {
+.countdown_show7 .countdown_section {
 	width: 14%;
 }
 .countdown_section {
+	display: block;
 	float: left;
-	font-size: 75%
+	font-size: 75%;
+	text-align: center;
 }
 .countdown_amount {
 	font-size: 200%;
 }
 .countdown_descr {
+	display: block;
 	width: 100%;
 }
