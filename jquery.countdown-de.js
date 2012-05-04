@@ -3,7 +3,7 @@
    Written by Keith Wood (kbwood@virginbroadband.com.au) Jan 2008. */
 $(document).ready(function() {
 	$.countdown.regional['de'] = {
-		labels: ['Tage', 'Stunden', 'Minuten', 'Sekunden'],
-		compactDays: 't', timeSeparator: ':'};
+		labels: ['Jahren', 'Monate', 'Wochen', 'Tage', 'Stunden', 'Minuten', 'Sekunden'],
+		compactLabels: ['J', 'M', 'W', 'T'], timeSeparator: ':'};
 	$.countdown.setDefaults($.countdown.regional['de']);
 });

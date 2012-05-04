@@ -1,5 +1,5 @@
 /* http://keith-wood.name/countdown.html
-   Countdown for jQuery v1.0.0.
+   Countdown for jQuery v1.1.0.
    Written by Keith Wood (kbwood@virginbroadband.com.au) January 2008.
    Dual licensed under the GPL (http://dev.jquery.com/browser/trunk/jquery/GPL-LICENSE.txt) and 
    MIT (http://dev.jquery.com/browser/trunk/jquery/MIT-LICENSE.txt) licenses. 
@@ -7,7 +7,7 @@
 
 /* Display a countdown timer.
    Attach it with options like:
-   $('div selector').attachCountdown(
+   $('div selector').countdown(
        {until: new Date(2008, 12 - 1, 31, 23, 59, 59), onExpiry: blastoff}); */
 
 (function($) { // Hide scope, no $ conflict
@@ -18,15 +18,17 @@ function Countdown() {
 	this._inst = []; // List of instances indexed by ID
 	this.regional = []; // Available regional settings, indexed by language code
 	this.regional[''] = { // Default regional settings
-		labels: ['Days', 'Hours', 'Minutes', 'Seconds'], // The display texts for the counters
-		compactDays: 'd', // The text for days in the compact format
-		timeSeparator: ':' // Separator for time parts
+		// The display texts for the counters
+		labels: ['Years', 'Months', 'Weeks', 'Days', 'Hours', 'Minutes', 'Seconds'],
+		compactLabels: ['y', 'm', 'w', 'd'], // The compact texts for the counters
+		timeSeparator: ':' // Separator for time periods
 	};
 	this._defaults = {
-		showDays: 'asNeeded', // Determine when days are shown: 'always', 'never', 'asNeeded'
-		showSeconds: true, // True to show seconds as well, false for days/hours/minutes only
+		format: 'dHMS', // Format for display - upper case for always, lower case only if non-zero,
+			// 'Y' years, 'O' months, 'W' weeks, 'D' days, 'H' hours, 'M' minutes, 'S' seconds
 		compact: false, // True to display in a compact format, false for an expanded one
 		description: '', // The description displayed for the countdown
+		expiryUrl: null, // A URL to load upon expiry
 		onExpiry: null, // Callback when the countdown expires
 		onTick: null // Callback when the countdown is updated
 	};
@@ -56,6 +58,15 @@ $.extend(Countdown.prototype, {
 		extendRemove(this._defaults, settings || {});
 	},
 
+	/* Reconfigure the settings for a countdown div. */
+	_changeCountdown: function(target, settings) {
+		var inst = this._getInst(target._cdnId);
+		if (inst) {
+			extendRemove(inst._settings, settings || {});
+			this._updateCountdown(inst._id);
+		}
+	},
+
 	/* Attach the countdown widget to a div. */
 	_attachCountdown: function(target, inst) {
 		target = $(target);
@@ -82,12 +93,16 @@ $.extend(Countdown.prototype, {
 				if (onExpiry) {
 					onExpiry.apply(inst._target[0], []);
 				}
+				var expiryUrl = inst._get('expiryUrl');
+				if (expiryUrl) {
+					window.location = expiryUrl;
+				}
 			}
 			inst._timer = null;
 		}
 		else {
 			inst._timer = setTimeout('$.countdown._updateCountdown(' + inst._id + ')',
-				(inst._get('showSeconds') ? 1 : 30) * 980);  // just under the full time
+				(inst._get('format').match('s|S') ? 1 : 30) * 980);  // just under the full time
 		}
 	},
 
@@ -105,6 +120,14 @@ $.extend(Countdown.prototype, {
 	}
 });
 
+var Y = 0; // Years
+var O = 1; // Months
+var W = 2; // Weeks
+var D = 3; // Days
+var H = 4; // Hours
+var M = 5; // Minutes
+var S = 6; // Seconds
+
 /* Individualised settings for countdown widgets applied to one or more divs.
    Instances are managed and manipulated through the Countdown manager. */
 function CountdownInstance(settings) {
@@ -112,7 +135,8 @@ function CountdownInstance(settings) {
 	this._target = null; // jQuery wrapper of target div
 	this._timer = null; // The active timer for this countdown
 	this._now = null; // The last time used for display
-	this._periods = [0, 0, 0, 0]; // Differences by period (days/hours/mins/secs)
+	// Differences by period (years/months/weeks/days/hours/mins/secs)
+	this._periods = [0, 0, 0, 0, 0, 0, 0];
 	// Customise the countdown object - uses manager defaults if not overridden
 	this._settings = extendRemove({}, settings || {}); // clone
 }
@@ -125,45 +149,79 @@ $.extend(CountdownInstance.prototype, {
 	
 	/* Generate the HTML to display the countdown widget. */
 	_generateHTML: function() {
-		var showDays = this._get('showDays');
-		var showSeconds = this._get('showSeconds');
+		// Determine what to show
+		var format = this._get('format');
+		var show = [];
+		show[Y] = (format.match('y') ? '?' : (format.match('Y') ? '!' : null));
+		show[O] = (format.match('o') ? '?' : (format.match('O') ? '!' : null));
+		show[W] = (format.match('w') ? '?' : (format.match('W') ? '!' : null));
+		show[D] = (format.match('d') ? '?' : (format.match('D') ? '!' : null));
+		show[H] = (format.match('h') ? '?' : (format.match('H') ? '!' : null));
+		show[M] = (format.match('m') ? '?' : (format.match('M') ? '!' : null));
+		show[S] = (format.match('s') ? '?' : (format.match('S') ? '!' : null));
+		// Find endpoints
 		this._now = new Date();
 		this._now.setMilliseconds(0);
 		var until = this._getUntil(this._now);
 		if (this._now.getTime() > until.getTime()) {
 			this._now = until;
 		}
-		var diff = Math.floor((until.getTime() - this._now.getTime()) / 1000);
-		this._periods[0] = Math.floor(diff / 86400);
-		this._periods[1] = Math.floor(diff / 3600) - (this._periods[0] * 24);
-		this._periods[2] = Math.floor(diff / 60) - (this._periods[0] * 1440 + this._periods[1] * 60);
-		this._periods[3] = (!showSeconds ? 0 :
-			diff - (this._periods[0] * 86400 + this._periods[1] * 3600 + this._periods[2] * 60));
-		showDays = showDays == 'always' || (showDays == 'asNeeded' && this._periods[0] > 0);
-		if (!showDays) {
-			this._periods[1] += this._periods[0] * 24;
-			this._periods[0] = 0;
+		// Calculate differences by period
+		if (show[Y] || show[O]) {
+			var months = (until.getFullYear() - this._now.getFullYear()) * 12 +
+				until.getMonth() - this._now.getMonth();
+			this._periods[Y] = (show[Y] ? Math.floor(months / 12) : 0);
+			this._periods[O] = (show[O] ? months - this._periods[Y] * 12 : 0);
+			until = new Date(until.getTime());
+			until.setFullYear(until.getFullYear() - this._periods[Y]);
+			until.setMonth(until.getMonth() - this._periods[O]);
 		}
-		var labels = this._get('labels');
+		else {
+			this._periods[Y] = this._periods[O] = 0;
+		}
+		var diff = Math.floor((until.getTime() - this._now.getTime()) / 1000);
+		var periods = this._periods;
+		var extractPeriod = function(period, numSecs) {
+			periods[period] = (show[period] ? Math.floor(diff / numSecs) : 0);
+			diff -= periods[period] * numSecs;
+		};
+		extractPeriod(W, 604800);
+		extractPeriod(D, 86400);
+		extractPeriod(H, 3600);
+		extractPeriod(M, 60);
+		extractPeriod(S, 1);
+		// Show all 'asNeeded' after first non-zero value
+		var shownNonZero = false;
+		var showCount = 0;
+		for (var period = 0; period < show.length; period++) {
+			shownNonZero |= (show[period] == '?' && periods[period] > 0);
+			show[period] = (show[period] == '?' && !shownNonZero ? null : show[period]);
+			showCount += (show[period] ? 1 : 0);
+		}
 		var compact = this._get('compact');
-		var compactDays = this._get('compactDays');
+		var labels = (compact ? this._get('compactLabels') : this._get('labels'));
 		var timeSeparator = this._get('timeSeparator');
 		var description = this._get('description') || '';
 		var twoDigits = function(value) {
 			return (value < 10 ? '0' : '') + value;
 		};
-		var html = (compact ? '<div class="countdown_row countdown_amount">' + 
-			(showDays ? this._periods[0] + compactDays + ' ' : '') + twoDigits(this._periods[1]) + timeSeparator +
-			twoDigits(this._periods[2]) + (showSeconds ? timeSeparator + twoDigits(this._periods[3]) : '') :
-			'<div class="countdown_row countdown_show' + (2 + (showDays ? 1 : 0) + (showSeconds ? 1 : 0)) + '">' +
-			(showDays ? '<div class="countdown_section"><span class="countdown_amount">' +
-			this._periods[0] + '</span><br/>' + labels[0] + '</div>' : '') +
-			'<div class="countdown_section"><span class="countdown_amount">' +
-			(this._periods[1] + (showDays ? 0 : this._periods[0] * 24)) + '</span><br/>' + labels[1] + '</div>' +
-			'<div class="countdown_section"><span class="countdown_amount">' +
-			this._periods[2] + '</span><br/>' + labels[2] + '</div>' +
-			(showSeconds ? '<div class="countdown_section"><span class="countdown_amount">' +
-			this._periods[3] + '</span><br/>' + labels[3] + '</div>' : '')) + '</div>' +
+		var showCompact = function(period) {
+			return (show[period] ? periods[period] + labels[period] + ' ' : '');
+		};
+		var showFull = function(period) {
+			return (show[period] ? '<div class="countdown_section"><span class="countdown_amount">' +
+				periods[period] + '</span><br/>' + labels[period] + '</div>' : '');
+		};
+		var html = (compact ?
+			// Compact version
+			'<div class="countdown_row countdown_amount">' + 
+			showCompact(Y) + showCompact(O) + showCompact(W) + showCompact(D) + 
+			twoDigits(this._periods[H]) + timeSeparator +
+			twoDigits(this._periods[M]) + (show[S] ? timeSeparator + twoDigits(this._periods[S]) : '') :
+			// Full version
+			'<div class="countdown_row countdown_show' + showCount + '">' +
+			showFull(Y) + showFull(O) + showFull(W) + showFull(D) +
+			showFull(H) + showFull(M) + showFull(S)) + '</div>' +
 			(description ? '<div class="countdown_row countdown_descr">' + description + '</div>' : '');
 		return html;
 	},
@@ -188,31 +246,17 @@ function extendRemove(target, props) {
 }
 
 /* Attach the countdown functionality to a jQuery selection.
-   @param  settings  object - the new settings to use for these countdown instances
+   @param  command  string - the command to run (optional, default 'attach')
+   @param  options  object - the new settings to use for these countdown instances
    @return  jQuery object - for chaining further calls */
-$.fn.attachCountdown = function(settings) {
+$.fn.countdown = function(options) {
+	var otherArgs = Array.prototype.slice.call(arguments, 1);
 	return this.each(function() {
-		$.countdown._attachCountdown(this, new CountdownInstance(settings));
-	});
-};
-
-/* Remove the countdown functionality from a jQuery selection.
-   @return  jQuery object - for chaining further calls */
-$.fn.removeCountdown = function() {
-	return this.each(function() {
-		$.countdown._removeCountdown(this);
-	});
-};
-
-/* Reconfigure the settings for a countdown div.
-   @param  settings  object - the new settings
-   @return  jQuery object - for chaining further calls */
-$.fn.changeCountdown = function(settings) {
-	return this.each(function() {
-		var inst = $.countdown._getInst(this._cdnId);
-		if (inst) {
-			extendRemove(inst._settings, settings || {});
-			$.countdown._updateCountdown(inst._id);
+		if (typeof options == "string") {
+			$.countdown['_' + options + "Countdown"].apply($.countdown, [this].concat(otherArgs));
+		}
+		else {
+			$.countdown._attachCountdown(this, new CountdownInstance(options));
 		}
 	});
 };
