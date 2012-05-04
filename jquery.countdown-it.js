@@ -3,7 +3,7 @@
  * Written by Davide Bellettini (davide.bellettini@gmail.com) Feb 2008. */
 $.countdown.regional['it'] = {
 	labels: ['Anni', 'Mesi', 'Settimane', 'Giorni', 'Ore', 'Minuti', 'Secondi'],
-	labelsSingle: ['Anni', 'Mesi', 'Settimane', 'Giorni', 'Ore', 'Minuti', 'Secondi'],
-	compactLabels: ['a', 'm', 's', 'g'], compactLabelsSingle: ['a', 'm', 's', 'g'],
-	timeSeparator: ':'};
+	labels1: ['Anni', 'Mesi', 'Settimane', 'Giorni', 'Ore', 'Minuti', 'Secondi'],
+	compactLabels: ['a', 'm', 's', 'g'],
+	timeSeparator: ':', isRTL: false};
 $.countdown.setDefaults($.countdown.regional['it']);

@@ -1,5 +1,5 @@
 /* http://keith-wood.name/countdown.html
-   Countdown for jQuery v1.4.1.
+   Countdown for jQuery v1.4.2.
    Written by Keith Wood (kbwood@virginbroadband.com.au) January 2008.
    Dual licensed under the GPL (http://dev.jquery.com/browser/trunk/jquery/GPL-LICENSE.txt) and 
    MIT (http://dev.jquery.com/browser/trunk/jquery/MIT-LICENSE.txt) licenses. 
@@ -19,10 +19,10 @@ function Countdown() {
 		// The display texts for the counters
 		labels: ['Years', 'Months', 'Weeks', 'Days', 'Hours', 'Minutes', 'Seconds'],
 		// The display texts for the counters if only one
-		labelsSingle: ['Year', 'Month', 'Week', 'Day', 'Hour', 'Minute', 'Second'],
+		labels1: ['Year', 'Month', 'Week', 'Day', 'Hour', 'Minute', 'Second'],
 		compactLabels: ['y', 'm', 'w', 'd'], // The compact texts for the counters
-		compactLabelsSingle: ['y', 'm', 'w', 'd'], // The compact texts for the counters if only one
-		timeSeparator: ':' // Separator for time periods
+		timeSeparator: ':', // Separator for time periods
+		isRTL: false // True for right-to-left languages, false for left-to-right
 	};
 	this._defaults = {
 		format: 'dHMS', // Format for display - upper case for always, lower case only if non-zero,
@@ -59,6 +59,7 @@ $.extend(Countdown.prototype, {
 	/* Override the default settings for all instances of the countdown widget.
 	   @param  options  object - the new settings to use as defaults */
 	setDefaults: function(options) {
+		this._resetExtraLabels(this._defaults, options);
 		extendRemove(this._defaults, options || {});
 	},
 
@@ -92,6 +93,7 @@ $.extend(Countdown.prototype, {
 			return;
 		}
 		target.html(this._generateHTML(inst));
+		target[(this._get(inst, 'isRTL') ? 'add' : 'remove') + 'Class']('countdown_rtl');
 		var onTick = this._get(inst, 'onTick');
 		if (onTick) {
 			onTick.apply(target[0], [inst._hold != 'lap' ? inst._periods :
@@ -130,10 +132,31 @@ $.extend(Countdown.prototype, {
 	_changeCountdown: function(target, options) {
 		var inst = $.data(target, PROP_NAME);
 		if (inst) {
+			this._resetExtraLabels(inst.options, options);
 			extendRemove(inst.options, options || {});
 			this._adjustSettings(inst);
 			$.data(target, PROP_NAME, inst);
 			this._updateCountdown(target, inst);
+		}
+	},
+
+	/* Reset any extra labelsn and compactLabelsn entries if changing labels.
+	   @param  base     (object) the options to be updated
+	   @param  options  (object) the new option values */
+	_resetExtraLabels: function(base, options) {
+		var changingLabels = false;
+		for (var n in options) {
+			if (n.match(/[Ll]abels/)) {
+				changingLabels = true;
+				break;
+			}
+		}
+		if (changingLabels) {
+			for (var n in base) { // Remove custom numbered labels
+				if (n.match(/[Ll]abels[0-9]/)) {
+					base[n] = null;
+				}
+			}
 		}
 	},
 
@@ -301,23 +324,24 @@ $.extend(Countdown.prototype, {
 		var compact = this._get(inst, 'compact');
 		var layout = this._get(inst, 'layout');
 		var labels = (compact ? this._get(inst, 'compactLabels') : this._get(inst, 'labels'));
-		var labelsSingle = (compact ? this._get(inst, 'compactLabelsSingle') :
-			this._get(inst, 'labelsSingle')) || labels;
 		var timeSeparator = this._get(inst, 'timeSeparator');
 		var description = this._get(inst, 'description') || '';
 		var twoDigits = function(value) {
 			return (value < 10 ? '0' : '') + value;
 		};
 		var showCompact = function(period) {
-			return (inst._show[period] ? periods[period] + (periods[period] == 1 ?
-				labelsSingle[period] : labels[period]) + ' ' : '');
+			var labelsNum = $.countdown._get(inst, 'compactLabels' + periods[period]);
+			return (inst._show[period] ? periods[period] +
+				(labelsNum ? labelsNum[period] : labels[period]) + ' ' : '');
 		};
 		var showFull = function(period) {
-			return (inst._show[period] ? '<div class="countdown_section"><span class="countdown_amount">' +
-				periods[period] + '</span><br/>' + (periods[period] == 1 ?
-				labelsSingle[period] : labels[period]) + '</div>' : '');
+			var labelsNum = $.countdown._get(inst, 'labels' + periods[period]);
+			return (inst._show[period] ?
+				'<div class="countdown_section"><span class="countdown_amount">' +
+				periods[period] + '</span><br/>' +
+				(labelsNum ? labelsNum[period] : labels[period]) + '</div>' : '');
 		};
-		return (layout ? this._buildLayout(inst, layout, labels, labelsSingle) :
+		return (layout ? this._buildLayout(inst, layout, compact) :
 			((compact ? // Compact version
 			'<div class="countdown_row countdown_amount' +
 			(inst._hold ? ' countdown_holding' : '') + '">' + 
@@ -335,12 +359,12 @@ $.extend(Countdown.prototype, {
 	},
 
 	/* Construct a custom layout.
-	   @param  inst          object - the current settings for this instance
-	   @param  layout        string - the customised layout
-	   @param  labels        string[] - the plural labels for each period
-	   @param  labelsSingle  string[] - the singular labels for each period
+	   @param  inst     (object) the current settings for this instance
+	   @param  layout   (string) the customised layout
+	   @param  compact  (boolean) true if using compact labels
 	   @return  string - the custom HTML */
-	_buildLayout: function(inst, layout, labels, labelsSingle) {
+	_buildLayout: function(inst, layout, compact) {
+		var labels = (compact ? this._get(inst, 'compactLabels') : this._get(inst, 'labels'));
 		var html = layout;
 		var processPeriod = function(period, index) {
 			var pattern1 = new RegExp('%' + period + '.*%' + period);
@@ -357,12 +381,13 @@ $.extend(Countdown.prototype, {
 			}
 		};
 		var customisePeriod = function(text, period, index) {
+			var labelsNum = $.countdown._get(inst,
+				(compact ? 'compactLabels' : 'labels') + inst._periods[index]);
 			return text.substr(2, text.length - 4).
 				replace(/%nn/g, (inst._periods[index] < 10 ? '0' : '') +
 				inst._periods[index]).
 				replace(/%n/g, inst._periods[index]).
-				replace(/%l/g, inst._periods[index] == 1 ?
-				labelsSingle[index] : labels[index]);
+				replace(/%l/g, (labelsNum ? labelsNum[index] : labels[index]));
 		};
 		processPeriod('Y', Y);
 		processPeriod('O', O);

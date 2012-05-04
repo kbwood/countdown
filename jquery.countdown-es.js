@@ -3,7 +3,7 @@
  * Written by Sergio Carracedo Martinez webmaster@neodisenoweb.com (2008) */
 $.countdown.regional['es'] = {
 	labels: ['A&ntilde;os', 'Meses', 'Semanas', 'Dias', 'Horas', 'Minutos', 'Segundos'],
-	labelsSingle: ['A&ntilde;os', 'Meses', 'Semanas', 'Dias', 'Horas', 'Minutos', 'Segundos'],
-	compactLabels: ['a', 'm', 's', 'g'], compactLabelsSingle: ['a', 'm', 's', 'g'],
-	timeSeparator: ':'};
+	labels1: ['A&ntilde;os', 'Meses', 'Semanas', 'Dias', 'Horas', 'Minutos', 'Segundos'],
+	compactLabels: ['a', 'm', 's', 'g'],
+	timeSeparator: ':', isRTL: false};
 $.countdown.setDefaults($.countdown.regional['es']);

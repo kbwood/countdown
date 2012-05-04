@@ -3,7 +3,7 @@
  * Written by Pawel Lewtak lewtak@gmail.com (2008) */
 $.countdown.regional['pl'] = {
 	labels: ['lat', 'miesięcy', 'tygodni', 'dni', 'godzin', 'minut', 'sekund'],
-	labelsSingle: ['rok', 'miesiac', 'tydzien', 'dzien', 'godzina', 'minuta', 'sekunda'],
-	compactLabels: ['l', 'm', 't', 'd'], compactLabelsSingle: ['r', 'm', 't', 'd'],
-	timeSeparator: ':'};
+	labels1: ['rok', 'miesiac', 'tydzien', 'dzien', 'godzina', 'minuta', 'sekunda'],
+	compactLabels: ['l', 'm', 't', 'd'], compactLabels1: ['r', 'm', 't', 'd'],
+	timeSeparator: ':', isRTL: false};
 $.countdown.setDefaults($.countdown.regional['pl']);

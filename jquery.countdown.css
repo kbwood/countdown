@@ -3,6 +3,9 @@
 	border: 1px solid #ccc;
 	background-color: #eee;
 }
+.countdown_rtl {
+	direction: rtl;
+}
 .countdown_holding div {
 	background-color: #ccc;
 }

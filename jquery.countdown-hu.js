@@ -3,7 +3,7 @@
  * Written by Edmond L. (webmond@gmail.com). */
 $.countdown.regional['hu'] = {
 	labels: ['Év', 'Hónap', 'Hét', 'Nap', 'Óra', 'Perc', 'Másodperc'],
-	labelsSingle: ['Év', 'Hónap', 'Hét', 'Nap', 'Óra', 'Perc', 'Másodperc'],
-	compactLabels: ['É', 'H', 'Hé', 'N'], compactLabelsSingle: ['É', 'H', 'Hé', 'N'],
-	timeSeparator: ':'};
+	labels1: ['Év', 'Hónap', 'Hét', 'Nap', 'Óra', 'Perc', 'Másodperc'],
+	compactLabels: ['É', 'H', 'Hé', 'N'],
+	timeSeparator: ':', isRTL: false};
 $.countdown.setDefaults($.countdown.regional['hu']);
