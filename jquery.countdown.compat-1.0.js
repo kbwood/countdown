@@ -27,6 +27,17 @@ function adjustSettings(settings) {
 		} : null)});
 }
 
+/* jQuery extend now ignores nulls! */
+function extendRemove(target, props) {
+	$.extend(target, props);
+	for (var name in props) {
+		if (props[name] == null) {
+			target[name] = null;
+		}
+	}
+	return target;
+}
+
 /* Attach the countdown functionality to a jQuery selection.
    @param  settings  object - the new settings to use for these countdown instances
    @return  jQuery object - for chaining further calls */

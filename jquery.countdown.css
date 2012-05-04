@@ -1,4 +1,11 @@
 /* countdown styles */
+.hasCountdown {
+	border: 1px solid #ccc;
+	background-color: #eee;
+}
+.countdown_holding div {
+	background-color: #ccc;
+}
 .countdown_row {
 	clear: both;
 	width: 100%;
