@@ -1,5 +1,5 @@
 /* http://keith-wood.name/countdown.html
-   Countdown for jQuery v1.5.10.
+   Countdown for jQuery v1.5.11.
    Written by Keith Wood (kbwood{at}iinet.com.au) January 2008.
    Dual licensed under the GPL (http://dev.jquery.com/browser/trunk/jquery/GPL-LICENSE.txt) and 
    MIT (http://dev.jquery.com/browser/trunk/jquery/MIT-LICENSE.txt) licenses. 
@@ -55,7 +55,7 @@ function Countdown() {
 	this._serverSyncs = [];
 	// Shared timer for all countdowns
 	function timerCallBack(timestamp) {
-		var drawStart = (timestamp || Date.now());
+		var drawStart = (timestamp || new Date().getTime());
 		if (drawStart - animationStartTime >= 1000) {
 			$.countdown._updateTargets();
 			animationStartTime = drawStart;
@@ -65,11 +65,12 @@ function Countdown() {
 	var requestAnimationFrame = window.requestAnimationFrame || window.webkitRequestAnimationFrame ||
 		window.mozRequestAnimationFrame || window.oRequestAnimationFrame ||
 		window.msRequestAnimationFrame || null; // this is when we expect a fall-back to setInterval as it's much more fluid
-	var animationStartTime = window.mozAnimationStartTime || Date.now();
+	var animationStartTime = 0;
 	if (!requestAnimationFrame) {
 		setInterval(function() { $.countdown._updateTargets(); }, 980); // Fall back to good old setInterval
 	}
 	else {
+		animationStartTime = window.mozAnimationStartTime || new Date().getTime();
 		requestAnimationFrame(timerCallBack);
 	}
 }
