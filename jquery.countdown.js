@@ -1,5 +1,5 @@
 /* http://keith-wood.name/countdown.html
-   Countdown for jQuery v1.5.3.
+   Countdown for jQuery v1.5.4.
    Written by Keith Wood (kbwood{at}iinet.com.au) January 2008.
    Dual licensed under the GPL (http://dev.jquery.com/browser/trunk/jquery/GPL-LICENSE.txt) and 
    MIT (http://dev.jquery.com/browser/trunk/jquery/MIT-LICENSE.txt) licenses. 
@@ -33,6 +33,7 @@ function Countdown() {
 			// 'Y' years, 'O' months, 'W' weeks, 'D' days, 'H' hours, 'M' minutes, 'S' seconds
 		timezone: null, // The timezone (hours or minutes from GMT) for the target times,
 			// or null for client local
+		serverSync: null, // A function to retrieve the current server time for synchronisation
 		format: 'dHMS', // Format for display - upper case for always, lower case only if non-zero,
 			// 'Y' years, 'O' months, 'W' weeks, 'D' days, 'H' hours, 'M' minutes, 'S' seconds
 		layout: '', // Build your own layout for the countdown
@@ -217,7 +218,7 @@ $.extend(Countdown.prototype, {
 		if (inst) {
 			this._resetExtraLabels(inst.options, options);
 			extendRemove(inst.options, options);
-			this._adjustSettings(inst);
+			this._adjustSettings(target, inst);
 			$.data(target, PROP_NAME, inst);
 			var now = new Date();
 			if ((inst._since && inst._since < now) ||
@@ -246,6 +247,31 @@ $.extend(Countdown.prototype, {
 				}
 			}
 		}
+	},
+	
+	/* Calculate interal settings for an instance.
+	   @param  target  (element) the containing division
+	   @param  inst    (object) the current settings for this instance */
+	_adjustSettings: function(target, inst) {
+		var serverSync = this._get(inst, 'serverSync');
+		serverSync = (serverSync ? serverSync.apply(target, []) : null);
+		var now = new Date();
+		var timezone = this._get(inst, 'timezone');
+		timezone = (timezone == null ? -now.getTimezoneOffset() : timezone);
+		inst._since = this._get(inst, 'since');
+		if (inst._since) {
+			inst._since = this.UTCDate(timezone, this._determineTime(inst._since, null));
+			if (inst._since && serverSync) {
+				inst._since.setMilliseconds(inst._since.getMilliseconds() +
+					now.getTime() - serverSync.getTime());
+			}
+		}
+		inst._until = this.UTCDate(timezone, this._determineTime(this._get(inst, 'until'), now));
+		if (serverSync) {
+			inst._until.setMilliseconds(inst._until.getMilliseconds() +
+				now.getTime() - serverSync.getTime());
+		}
+		inst._show = this._determineShow(inst);
 	},
 
 	/* Remove the countdown widget from a div.
@@ -319,20 +345,6 @@ $.extend(Countdown.prototype, {
 	_get: function(inst, name) {
 		return (inst.options[name] != null ?
 			inst.options[name] : $.countdown._defaults[name]);
-	},
-	
-	/* Calculate interal settings for an instance.
-	   @param  inst  (object) the current settings for this instance */
-	_adjustSettings: function(inst) {
-		var now = new Date();
-		var timezone = this._get(inst, 'timezone');
-		timezone = (timezone == null ? -new Date().getTimezoneOffset() : timezone);
-		inst._since = this._get(inst, 'since');
-		if (inst._since) {
-			inst._since = this.UTCDate(timezone, this._determineTime(inst._since, null));
-		}
-		inst._until = this.UTCDate(timezone, this._determineTime(this._get(inst, 'until'), now));
-		inst._show = this._determineShow(inst);
 	},
 
 	/* A time may be specified as an exact value or a relative one.
