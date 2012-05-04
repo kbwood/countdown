@@ -1,5 +1,5 @@
 /* http://keith-wood.name/countdown.html
-   Countdown for jQuery v1.5.4.
+   Countdown for jQuery v1.5.5.
    Written by Keith Wood (kbwood{at}iinet.com.au) January 2008.
    Dual licensed under the GPL (http://dev.jquery.com/browser/trunk/jquery/GPL-LICENSE.txt) and 
    MIT (http://dev.jquery.com/browser/trunk/jquery/MIT-LICENSE.txt) licenses. 
@@ -108,6 +108,18 @@ $.extend(Countdown.prototype, {
 		d.setUTCSeconds(secs || 0);
 		d.setUTCMilliseconds(ms || 0);
 		return d;
+	},
+
+	/* Retrieve one or more settings values.
+	   @param  name  (string, optional) the name of the setting to retrieve
+	                 or 'all' for all instance settings or omit for all default settings
+	   @return  (any) the requested setting(s) */
+	_settingsCountdown: function(target, name) {
+		if (!name) {
+			return $.countdown._defaults;
+		}
+		var inst = $.data(target, PROP_NAME);
+		return (name == 'all' ? inst.options : inst.options[name]);
 	},
 
 	/* Attach the countdown widget to a div.
@@ -473,24 +485,31 @@ $.extend(Countdown.prototype, {
 			yl: labelFor(Y), yn: inst._periods[Y], ynn: this._minDigits(inst._periods[Y], 2),
 			ynnn: this._minDigits(inst._periods[Y], 3), y1: digit(inst._periods[Y], 1),
 			y10: digit(inst._periods[Y], 10), y100: digit(inst._periods[Y], 100),
+			y1000: digit(inst._periods[Y], 1000),
 			ol: labelFor(O), on: inst._periods[O], onn: this._minDigits(inst._periods[O], 2),
 			onnn: this._minDigits(inst._periods[O], 3), o1: digit(inst._periods[O], 1),
 			o10: digit(inst._periods[O], 10), o100: digit(inst._periods[O], 100),
+			o1000: digit(inst._periods[O], 1000),
 			wl: labelFor(W), wn: inst._periods[W], wnn: this._minDigits(inst._periods[W], 2),
 			wnnn: this._minDigits(inst._periods[W], 3), w1: digit(inst._periods[W], 1),
 			w10: digit(inst._periods[W], 10), w100: digit(inst._periods[W], 100),
+			w1000: digit(inst._periods[W], 1000),
 			dl: labelFor(D), dn: inst._periods[D], dnn: this._minDigits(inst._periods[D], 2),
 			dnnn: this._minDigits(inst._periods[D], 3), d1: digit(inst._periods[D], 1),
 			d10: digit(inst._periods[D], 10), d100: digit(inst._periods[D], 100),
+			d1000: digit(inst._periods[D], 1000),
 			hl: labelFor(H), hn: inst._periods[H], hnn: this._minDigits(inst._periods[H], 2),
 			hnnn: this._minDigits(inst._periods[H], 3), h1: digit(inst._periods[H], 1),
 			h10: digit(inst._periods[H], 10), h100: digit(inst._periods[H], 100),
+			h1000: digit(inst._periods[H], 1000),
 			ml: labelFor(M), mn: inst._periods[M], mnn: this._minDigits(inst._periods[M], 2),
 			mnnn: this._minDigits(inst._periods[M], 3), m1: digit(inst._periods[M], 1),
 			m10: digit(inst._periods[M], 10), m100: digit(inst._periods[M], 100),
+			m1000: digit(inst._periods[M], 1000),
 			sl: labelFor(S), sn: inst._periods[S], snn: this._minDigits(inst._periods[S], 2),
 			snnn: this._minDigits(inst._periods[S], 3), s1: digit(inst._periods[S], 1),
-			s10: digit(inst._periods[S], 10), s100: digit(inst._periods[S], 100)};
+			s10: digit(inst._periods[S], 10), s100: digit(inst._periods[S], 100),
+			s1000: digit(inst._periods[S], 1000)};
 		var html = layout;
 		// Replace period containers: {p<}...{p>}
 		for (var i = 0; i < 7; i++) {
@@ -511,6 +530,10 @@ $.extend(Countdown.prototype, {
 	   @param  len    (number) the minimum length
 	   @return  (string) the display text */
 	_minDigits: function(value, len) {
+		value = '' + value;
+		if (value.length >= len) {
+			return value;
+		}
 		value = '0000000000' + value;
 		return value.substr(value.length - len);
 	},
@@ -543,11 +566,13 @@ $.extend(Countdown.prototype, {
 		inst._now = now;
 		inst._now.setMilliseconds(0);
 		var until = new Date(inst._now.getTime());
-		if (inst._since && now.getTime() < inst._since.getTime()) {
-			inst._now = now = until;
-		}
-		else if (inst._since) {
-			now = inst._since;
+		if (inst._since) {
+			if (now.getTime() < inst._since.getTime()) {
+				inst._now = now = until;
+			}
+			else {
+				now = inst._since;
+			}
 		}
 		else {
 			until.setTime(inst._until.getTime());
@@ -605,6 +630,26 @@ $.extend(Countdown.prototype, {
 		extractPeriod(H, 3600);
 		extractPeriod(M, 60);
 		extractPeriod(S, 1);
+		if (diff > 0 && !inst._since) { // Round up if left overs
+			var multiplier = [1, 12, 4.3482, 7, 24, 60, 60];
+			var lastShown = S;
+			var max = 1;
+			for (var period = S; period >= Y; period--) {
+				if (show[period]) {
+					if (periods[lastShown] >= max) {
+						periods[lastShown] = 0;
+						diff = 1;
+					}
+					if (diff > 0) {
+						periods[period]++;
+						diff = 0;
+						lastShown = period;
+						max = 1;
+					}
+				}
+				max *= multiplier[period];
+			}
+		}
 		return periods;
 	}
 });
@@ -629,7 +674,7 @@ function extendRemove(target, props) {
    @return  (jQuery) for chaining further calls */
 $.fn.countdown = function(options) {
 	var otherArgs = Array.prototype.slice.call(arguments, 1);
-	if (options == 'getTimes') {
+	if (options == 'getTimes' || options == 'settings') {
 		return $.countdown['_' + options + 'Countdown'].
 			apply($.countdown, [this[0]].concat(otherArgs));
 	}
