@@ -1,5 +1,5 @@
 /* http://keith-wood.name/countdown.html
-   Countdown for jQuery v1.5.2.
+   Countdown for jQuery v1.5.3.
    Written by Keith Wood (kbwood{at}iinet.com.au) January 2008.
    Dual licensed under the GPL (http://dev.jquery.com/browser/trunk/jquery/GPL-LICENSE.txt) and 
    MIT (http://dev.jquery.com/browser/trunk/jquery/MIT-LICENSE.txt) licenses. 
@@ -28,7 +28,7 @@ function Countdown() {
 		until: null, // new Date(year, mth - 1, day, hr, min, sec) - date/time to count down to
 			// or numeric for seconds offset, or string for unit offset(s):
 			// 'Y' years, 'O' months, 'W' weeks, 'D' days, 'H' hours, 'M' minutes, 'S' seconds
-		since: null, // new Date(year, mth - 1, day, hr, min, sec) - date/time to count up to
+		since: null, // new Date(year, mth - 1, day, hr, min, sec) - date/time to count up from
 			// or numeric for seconds offset, or string for unit offset(s):
 			// 'Y' years, 'O' months, 'W' weeks, 'D' days, 'H' hours, 'M' minutes, 'S' seconds
 		timezone: null, // The timezone (hours or minutes from GMT) for the target times,
@@ -429,10 +429,11 @@ $.extend(Countdown.prototype, {
 			'<span class="countdown_row countdown_amount' +
 			(inst._hold ? ' countdown_holding' : '') + '">' + 
 			showCompact(Y) + showCompact(O) + showCompact(W) + showCompact(D) + 
-			(inst._show[H] ? this._twoDigits(periods[H]) : '') +
-			(inst._show[M] ? (inst._show[H] ? timeSeparator : '') + this._twoDigits(periods[M]) : '') +
+			(inst._show[H] ? this._minDigits(periods[H], 2) : '') +
+			(inst._show[M] ? (inst._show[H] ? timeSeparator : '') +
+			this._minDigits(periods[M], 2) : '') +
 			(inst._show[S] ? (inst._show[H] || inst._show[M] ? timeSeparator : '') +
-			this._twoDigits(periods[S]) : '') :
+			this._minDigits(periods[S], 2) : '') :
 			// Full version
 			'<span class="countdown_row countdown_show' + showCount +
 			(inst._hold ? ' countdown_holding' : '') + '">' +
@@ -447,20 +448,37 @@ $.extend(Countdown.prototype, {
 	   @param  compact  (boolean) true if using compact labels
 	   @return  (string) the custom HTML */
 	_buildLayout: function(inst, layout, compact) {
-		var labels = (compact ? this._get(inst, 'compactLabels') : this._get(inst, 'labels'));
+		var labels = this._get(inst, (compact ? 'compactLabels' : 'labels'));
 		var labelFor = function(index) {
 			return ($.countdown._get(inst,
 				(compact ? 'compactLabels' : 'labels') + inst._periods[index]) ||
 				labels)[index];
 		};
-		var subs = {
-			yl: labelFor(Y), yn: inst._periods[Y], ynn: this._twoDigits(inst._periods[Y]),
-			ol: labelFor(O), on: inst._periods[O], onn: this._twoDigits(inst._periods[O]),
-			wl: labelFor(W), wn: inst._periods[W], wnn: this._twoDigits(inst._periods[W]),
-			dl: labelFor(D), dn: inst._periods[D], dnn: this._twoDigits(inst._periods[D]),
-			hl: labelFor(H), hn: inst._periods[H], hnn: this._twoDigits(inst._periods[H]),
-			ml: labelFor(M), mn: inst._periods[M], mnn: this._twoDigits(inst._periods[M]),
-			sl: labelFor(S), sn: inst._periods[S], snn: this._twoDigits(inst._periods[S])};
+		var digit = function(value, position) {
+			return Math.floor(value / position) % 10;
+		};
+		var subs = {desc: this._get(inst, 'description'), sep: this._get(inst, 'timeSeparator'),
+			yl: labelFor(Y), yn: inst._periods[Y], ynn: this._minDigits(inst._periods[Y], 2),
+			ynnn: this._minDigits(inst._periods[Y], 3), y1: digit(inst._periods[Y], 1),
+			y10: digit(inst._periods[Y], 10), y100: digit(inst._periods[Y], 100),
+			ol: labelFor(O), on: inst._periods[O], onn: this._minDigits(inst._periods[O], 2),
+			onnn: this._minDigits(inst._periods[O], 3), o1: digit(inst._periods[O], 1),
+			o10: digit(inst._periods[O], 10), o100: digit(inst._periods[O], 100),
+			wl: labelFor(W), wn: inst._periods[W], wnn: this._minDigits(inst._periods[W], 2),
+			wnnn: this._minDigits(inst._periods[W], 3), w1: digit(inst._periods[W], 1),
+			w10: digit(inst._periods[W], 10), w100: digit(inst._periods[W], 100),
+			dl: labelFor(D), dn: inst._periods[D], dnn: this._minDigits(inst._periods[D], 2),
+			dnnn: this._minDigits(inst._periods[D], 3), d1: digit(inst._periods[D], 1),
+			d10: digit(inst._periods[D], 10), d100: digit(inst._periods[D], 100),
+			hl: labelFor(H), hn: inst._periods[H], hnn: this._minDigits(inst._periods[H], 2),
+			hnnn: this._minDigits(inst._periods[H], 3), h1: digit(inst._periods[H], 1),
+			h10: digit(inst._periods[H], 10), h100: digit(inst._periods[H], 100),
+			ml: labelFor(M), mn: inst._periods[M], mnn: this._minDigits(inst._periods[M], 2),
+			mnnn: this._minDigits(inst._periods[M], 3), m1: digit(inst._periods[M], 1),
+			m10: digit(inst._periods[M], 10), m100: digit(inst._periods[M], 100),
+			sl: labelFor(S), sn: inst._periods[S], snn: this._minDigits(inst._periods[S], 2),
+			snnn: this._minDigits(inst._periods[S], 3), s1: digit(inst._periods[S], 1),
+			s10: digit(inst._periods[S], 10), s100: digit(inst._periods[S], 100)};
 		var html = layout;
 		// Replace period containers: {p<}...{p>}
 		for (var i = 0; i < 7; i++) {
@@ -476,11 +494,13 @@ $.extend(Countdown.prototype, {
 		return html;
 	},
 
-	/* Ensure a numeric value has at least two digits for display.
+	/* Ensure a numeric value has at least n digits for display.
 	   @param  value  (number) the value to display
+	   @param  len    (number) the minimum length
 	   @return  (string) the display text */
-	_twoDigits: function(value) {
-		return (value < 10 ? '0' : '') + value;
+	_minDigits: function(value, len) {
+		value = '0000000000' + value;
+		return value.substr(value.length - len);
 	},
 
 	/* Translate the format into flags for each period.
