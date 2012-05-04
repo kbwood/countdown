@@ -1,5 +1,5 @@
 /* http://keith-wood.name/countdown.html
-   Countdown for jQuery v1.5.6.
+   Countdown for jQuery v1.5.7.
    Written by Keith Wood (kbwood{at}iinet.com.au) January 2008.
    Dual licensed under the GPL (http://dev.jquery.com/browser/trunk/jquery/GPL-LICENSE.txt) and 
    MIT (http://dev.jquery.com/browser/trunk/jquery/MIT-LICENSE.txt) licenses. 
@@ -44,11 +44,13 @@ function Countdown() {
 		alwaysExpire: false, // True to trigger onExpiry even if never counted down
 		onExpiry: null, // Callback when the countdown expires -
 			// receives no parameters and 'this' is the containing division
-		onTick: null // Callback when the countdown is updated -
+		onTick: null, // Callback when the countdown is updated -
 			// receives int[7] being the breakdown by period (based on format)
 			// and 'this' is the containing division
+		tickInterval: 1 // Interval (seconds) between onTick callbacks
 	};
 	$.extend(this._defaults, this.regional['']);
+	this._serverSyncs = [];
 }
 
 var PROP_NAME = 'countdown';
@@ -170,7 +172,7 @@ $.extend(Countdown.prototype, {
 
 	/* Update each active timer target. */
 	_updateTargets: function() {
-		for (var i = 0; i < this._timerTargets.length; i++) {
+		for (var i = this._timerTargets.length - 1; i >= 0; i--) {
 			this._updateCountdown(this._timerTargets[i]);
 		}
 	},
@@ -190,7 +192,10 @@ $.extend(Countdown.prototype, {
 		if (onTick) {
 			var periods = inst._hold != 'lap' ? inst._periods :
 				this._calculatePeriods(inst, inst._show, new Date());
-			onTick.apply(target, [periods]);
+			var tickInterval = this._get(inst, 'tickInterval');
+			if (tickInterval == 1 || this.periodsToSeconds(periods) % tickInterval == 0) {
+				onTick.apply(target, [periods]);
+			}
 		}
 		var expired = inst._hold != 'pause' &&
 			(inst._since ? inst._now.getTime() < inst._since.getTime() :
@@ -275,23 +280,38 @@ $.extend(Countdown.prototype, {
 	   @param  target  (element) the containing division
 	   @param  inst    (object) the current settings for this instance */
 	_adjustSettings: function(target, inst) {
+		var now;
 		var serverSync = this._get(inst, 'serverSync');
-		serverSync = (serverSync ? serverSync.apply(target, []) : null);
-		var now = new Date();
+		var serverOffset = 0;
+		var serverEntry = null;
+		for (var i = 0; i < this._serverSyncs.length; i++) {
+			if (this._serverSyncs[i][0] == serverSync) {
+				serverEntry = this._serverSyncs[i][1];
+				break;
+			}
+		}
+		if (serverEntry != null) {
+			serverOffset = (serverSync ? serverEntry : 0);
+			now = new Date();
+		}
+		else {
+			var serverResult = (serverSync ? serverSync.apply(target, []) : null);
+			now = new Date();
+			serverOffset = (serverResult ? now.getTime() - serverResult.getTime() : 0);
+			this._serverSyncs.push([serverSync, serverOffset]);
+		}
 		var timezone = this._get(inst, 'timezone');
 		timezone = (timezone == null ? -now.getTimezoneOffset() : timezone);
 		inst._since = this._get(inst, 'since');
 		if (inst._since != null) {
 			inst._since = this.UTCDate(timezone, this._determineTime(inst._since, null));
-			if (inst._since && serverSync) {
-				inst._since.setMilliseconds(inst._since.getMilliseconds() +
-					now.getTime() - serverSync.getTime());
+			if (inst._since && serverOffset) {
+				inst._since.setMilliseconds(inst._since.getMilliseconds() + serverOffset);
 			}
 		}
 		inst._until = this.UTCDate(timezone, this._determineTime(this._get(inst, 'until'), now));
-		if (serverSync) {
-			inst._until.setMilliseconds(inst._until.getMilliseconds() +
-				now.getTime() - serverSync.getTime());
+		if (serverOffset) {
+			inst._until.setMilliseconds(inst._until.getMilliseconds() + serverOffset);
 		}
 		inst._show = this._determineShow(inst);
 	},
