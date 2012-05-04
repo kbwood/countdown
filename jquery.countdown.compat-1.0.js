@@ -37,7 +37,7 @@ $.fn.attachCountdown = function(settings) {
 /* Remove the countdown functionality from a jQuery selection.
    @return  jQuery object - for chaining further calls */
 $.fn.removeCountdown = function() {
-	return this.countdown('remove');
+	return this.countdown('destroy');
 };
 
 /* Reconfigure the settings for a countdown div.

@@ -1,5 +1,5 @@
 /* http://keith-wood.name/countdown.html
-   Countdown for jQuery v1.1.0.
+   Countdown for jQuery v1.1.1.
    Written by Keith Wood (kbwood@virginbroadband.com.au) January 2008.
    Dual licensed under the GPL (http://dev.jquery.com/browser/trunk/jquery/GPL-LICENSE.txt) and 
    MIT (http://dev.jquery.com/browser/trunk/jquery/MIT-LICENSE.txt) licenses. 
@@ -8,7 +8,7 @@
 /* Display a countdown timer.
    Attach it with options like:
    $('div selector').countdown(
-       {until: new Date(2008, 12 - 1, 31, 23, 59, 59), onExpiry: blastoff}); */
+       {until: new Date(2009, 1 - 1, 1, 0, 0, 0), onExpiry: happyNewYear}); */
 
 (function($) { // Hide scope, no $ conflict
 
@@ -28,9 +28,12 @@ function Countdown() {
 			// 'Y' years, 'O' months, 'W' weeks, 'D' days, 'H' hours, 'M' minutes, 'S' seconds
 		compact: false, // True to display in a compact format, false for an expanded one
 		description: '', // The description displayed for the countdown
-		expiryUrl: null, // A URL to load upon expiry
-		onExpiry: null, // Callback when the countdown expires
-		onTick: null // Callback when the countdown is updated
+		expiryUrl: null, // A URL to load upon expiry, replacing the current page
+		onExpiry: null, // Callback when the countdown expires -
+			// receives no parameters and 'this' is the containing division
+		onTick: null // Callback when the countdown is updated -
+			// receives int[7] being the breakdown by period (based on format)
+			// and 'this' is the containing division
 	};
 	$.extend(this._defaults, this.regional['']);
 }
@@ -56,15 +59,6 @@ $.extend(Countdown.prototype, {
 	   @return void */
 	setDefaults: function(settings) {
 		extendRemove(this._defaults, settings || {});
-	},
-
-	/* Reconfigure the settings for a countdown div. */
-	_changeCountdown: function(target, settings) {
-		var inst = this._getInst(target._cdnId);
-		if (inst) {
-			extendRemove(inst._settings, settings || {});
-			this._updateCountdown(inst._id);
-		}
 	},
 
 	/* Attach the countdown widget to a div. */
@@ -106,8 +100,17 @@ $.extend(Countdown.prototype, {
 		}
 	},
 
+	/* Reconfigure the settings for a countdown div. */
+	_changeCountdown: function(target, settings) {
+		var inst = this._getInst(target._cdnId);
+		if (inst) {
+			extendRemove(inst._settings, settings || {});
+			this._updateCountdown(inst._id);
+		}
+	},
+
 	/* Remove the countdown widget from a div. */
-	_removeCountdown: function(target) {
+	_destroyCountdown: function(target) {
 		target = $(target);
 		if (!target.is('.' + this.markerClassName)) {
 			return;
@@ -159,37 +162,7 @@ $.extend(CountdownInstance.prototype, {
 		show[H] = (format.match('h') ? '?' : (format.match('H') ? '!' : null));
 		show[M] = (format.match('m') ? '?' : (format.match('M') ? '!' : null));
 		show[S] = (format.match('s') ? '?' : (format.match('S') ? '!' : null));
-		// Find endpoints
-		this._now = new Date();
-		this._now.setMilliseconds(0);
-		var until = this._getUntil(this._now);
-		if (this._now.getTime() > until.getTime()) {
-			this._now = until;
-		}
-		// Calculate differences by period
-		if (show[Y] || show[O]) {
-			var months = (until.getFullYear() - this._now.getFullYear()) * 12 +
-				until.getMonth() - this._now.getMonth();
-			this._periods[Y] = (show[Y] ? Math.floor(months / 12) : 0);
-			this._periods[O] = (show[O] ? months - this._periods[Y] * 12 : 0);
-			until = new Date(until.getTime());
-			until.setFullYear(until.getFullYear() - this._periods[Y]);
-			until.setMonth(until.getMonth() - this._periods[O]);
-		}
-		else {
-			this._periods[Y] = this._periods[O] = 0;
-		}
-		var diff = Math.floor((until.getTime() - this._now.getTime()) / 1000);
-		var periods = this._periods;
-		var extractPeriod = function(period, numSecs) {
-			periods[period] = (show[period] ? Math.floor(diff / numSecs) : 0);
-			diff -= periods[period] * numSecs;
-		};
-		extractPeriod(W, 604800);
-		extractPeriod(D, 86400);
-		extractPeriod(H, 3600);
-		extractPeriod(M, 60);
-		extractPeriod(S, 1);
+		this._periods = periods = this._calculatePeriods(show, new Date());
 		// Show all 'asNeeded' after first non-zero value
 		var shownNonZero = false;
 		var showCount = 0;
@@ -212,7 +185,7 @@ $.extend(CountdownInstance.prototype, {
 			return (show[period] ? '<div class="countdown_section"><span class="countdown_amount">' +
 				periods[period] + '</span><br/>' + labels[period] + '</div>' : '');
 		};
-		var html = (compact ?
+		return (compact ?
 			// Compact version
 			'<div class="countdown_row countdown_amount">' + 
 			showCompact(Y) + showCompact(O) + showCompact(W) + showCompact(D) + 
@@ -223,7 +196,39 @@ $.extend(CountdownInstance.prototype, {
 			showFull(Y) + showFull(O) + showFull(W) + showFull(D) +
 			showFull(H) + showFull(M) + showFull(S)) + '</div>' +
 			(description ? '<div class="countdown_row countdown_descr">' + description + '</div>' : '');
-		return html;
+	},
+	
+	/* Calculate the requested periods between now and the target time. */
+	_calculatePeriods: function(show, now) {
+		// Find endpoints
+		this._now = now;
+		this._now.setMilliseconds(0);
+		var until = this._getUntil(this._now);
+		if (this._now.getTime() > until.getTime()) {
+			this._now = now = until;
+		}
+		// Calculate differences by period
+		var periods = [0, 0, 0, 0, 0, 0, 0];
+		if (show[Y] || show[O]) {
+			var months = Math.max(0, (until.getFullYear() - this._now.getFullYear()) * 12 +
+				until.getMonth() - this._now.getMonth() + (until.getDate() < this._now.getDate() ? -1 : 0));
+			periods[Y] = (show[Y] ? Math.floor(months / 12) : 0);
+			periods[O] = (show[O] ? months - periods[Y] * 12 : 0);
+			now = new Date(now.getTime());
+			now.setFullYear(now.getFullYear() + periods[Y]);
+			now.setMonth(now.getMonth() + periods[O]);
+		}
+		var diff = Math.floor((until.getTime() - now.getTime()) / 1000);
+		var extractPeriod = function(period, numSecs) {
+			periods[period] = (show[period] ? Math.floor(diff / numSecs) : 0);
+			diff -= periods[period] * numSecs;
+		};
+		extractPeriod(W, 604800);
+		extractPeriod(D, 86400);
+		extractPeriod(H, 3600);
+		extractPeriod(M, 60);
+		extractPeriod(S, 1);
+		return periods;
 	},
 
 	/* Get target time, defaulting if necessary. */
@@ -252,8 +257,8 @@ function extendRemove(target, props) {
 $.fn.countdown = function(options) {
 	var otherArgs = Array.prototype.slice.call(arguments, 1);
 	return this.each(function() {
-		if (typeof options == "string") {
-			$.countdown['_' + options + "Countdown"].apply($.countdown, [this].concat(otherArgs));
+		if (typeof options == 'string') {
+			$.countdown['_' + options + 'Countdown'].apply($.countdown, [this].concat(otherArgs));
 		}
 		else {
 			$.countdown._attachCountdown(this, new CountdownInstance(options));
