@@ -3,8 +3,8 @@
  * Written by Sergio Carracedo Martinez webmaster@neodisenoweb.com (2008) */
 (function($) {
 	$.countdown.regional['es'] = {
-		labels: ['Años', 'Meses', 'Semanas', 'Dias', 'Horas', 'Minutos', 'Segundos'],
-		labels1: ['Años', 'Meses', 'Semanas', 'Dias', 'Horas', 'Minutos', 'Segundos'],
+		labels: ['Años', 'Meses', 'Semanas', 'Días', 'Horas', 'Minutos', 'Segundos'],
+		labels1: ['Año', 'Mes', 'Semana', 'Día', 'Hora', 'Minuto', 'Segundo'],
 		compactLabels: ['a', 'm', 's', 'g'],
 		whichLabels: null,
 		timeSeparator: ':', isRTL: false};

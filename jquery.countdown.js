@@ -1,5 +1,5 @@
 /* http://keith-wood.name/countdown.html
-   Countdown for jQuery v1.5.9.
+   Countdown for jQuery v1.5.10.
    Written by Keith Wood (kbwood{at}iinet.com.au) January 2008.
    Dual licensed under the GPL (http://dev.jquery.com/browser/trunk/jquery/GPL-LICENSE.txt) and 
    MIT (http://dev.jquery.com/browser/trunk/jquery/MIT-LICENSE.txt) licenses. 
@@ -53,6 +53,25 @@ function Countdown() {
 	};
 	$.extend(this._defaults, this.regional['']);
 	this._serverSyncs = [];
+	// Shared timer for all countdowns
+	function timerCallBack(timestamp) {
+		var drawStart = (timestamp || Date.now());
+		if (drawStart - animationStartTime >= 1000) {
+			$.countdown._updateTargets();
+			animationStartTime = drawStart;
+		}
+		requestAnimationFrame(timerCallBack);
+	}
+	var requestAnimationFrame = window.requestAnimationFrame || window.webkitRequestAnimationFrame ||
+		window.mozRequestAnimationFrame || window.oRequestAnimationFrame ||
+		window.msRequestAnimationFrame || null; // this is when we expect a fall-back to setInterval as it's much more fluid
+	var animationStartTime = window.mozAnimationStartTime || Date.now();
+	if (!requestAnimationFrame) {
+		setInterval(function() { $.countdown._updateTargets(); }, 980); // Fall back to good old setInterval
+	}
+	else {
+		requestAnimationFrame(timerCallBack);
+	}
 }
 
 var PROP_NAME = 'countdown';
@@ -68,9 +87,7 @@ var S = 6; // Seconds
 $.extend(Countdown.prototype, {
 	/* Class name added to elements to indicate already configured with countdown. */
 	markerClassName: 'hasCountdown',
-	
-	/* Shared timer for all countdowns. */
-	_timer: setInterval(function() { $.countdown._updateTargets(); }, 980),
+
 	/* List of currently active countdown targets. */
 	_timerTargets: [],
 	
