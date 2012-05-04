@@ -1,5 +1,5 @@
 /* http://keith-wood.name/countdown.html
-   Countdown for jQuery v1.5.1.
+   Countdown for jQuery v1.5.2.
    Written by Keith Wood (kbwood{at}iinet.com.au) January 2008.
    Dual licensed under the GPL (http://dev.jquery.com/browser/trunk/jquery/GPL-LICENSE.txt) and 
    MIT (http://dev.jquery.com/browser/trunk/jquery/MIT-LICENSE.txt) licenses. 
@@ -38,7 +38,8 @@ function Countdown() {
 		layout: '', // Build your own layout for the countdown
 		compact: false, // True to display in a compact format, false for an expanded one
 		description: '', // The description displayed for the countdown
-		expiryUrl: null, // A URL to load upon expiry, replacing the current page
+		expiryUrl: '', // A URL to load upon expiry, replacing the current page
+		expiryText: '', // Text to display upon expiry, replacing the countdown
 		alwaysExpire: false, // True to trigger onExpiry even if never counted down
 		onExpiry: null, // Callback when the countdown expires -
 			// receives no parameters and 'this' is the containing division
@@ -64,7 +65,7 @@ $.extend(Countdown.prototype, {
 	markerClassName: 'hasCountdown',
 	
 	/* Shared timer for all countdowns. */
-	_timer: setInterval(function() { $.countdown._updateTargets(); }, 980),//900),
+	_timer: setInterval(function() { $.countdown._updateTargets(); }, 980),
 	/* List of currently active countdown targets. */
 	_timerTargets: [],
 	
@@ -98,6 +99,7 @@ $.extend(Countdown.prototype, {
 		}
 		var d = new Date();
 		d.setUTCFullYear(year);
+		d.setUTCDate(1);
 		d.setUTCMonth(month || 0);
 		d.setUTCDate(day || 1);
 		d.setUTCHours(hours || 0);
@@ -170,18 +172,27 @@ $.extend(Countdown.prototype, {
 		var expired = inst._hold != 'pause' &&
 			(inst._since ? inst._now.getTime() <= inst._since.getTime() :
 			inst._now.getTime() >= inst._until.getTime());
-		if (expired) {
+		if (expired && !inst._expiring) {
+			inst._expiring = true;
 			if (this._hasTarget(target) || this._get(inst, 'alwaysExpire')) {
+				this._removeTarget(target);
 				var onExpiry = this._get(inst, 'onExpiry');
 				if (onExpiry) {
 					onExpiry.apply(target, []);
+				}
+				var expiryText = this._get(inst, 'expiryText');
+				if (expiryText) {
+					var layout = this._get(inst, 'layout');
+					inst.options.layout = expiryText;
+					this._updateCountdown(target, inst);
+					inst.options.layout = layout;
 				}
 				var expiryUrl = this._get(inst, 'expiryUrl');
 				if (expiryUrl) {
 					window.location = expiryUrl;
 				}
 			}
-			this._removeTarget(target);
+			inst._expiring = false;
 		}
 		else if (inst._hold == 'pause') {
 			this._removeTarget(target);
@@ -335,9 +346,6 @@ $.extend(Countdown.prototype, {
 			time.setTime(time.getTime() + offset * 1000);
 			return time;
 		};
-		var getDaysInMonth = function(year, month) {
-			return 32 - new Date(year, month, 32).getDate();
-		};
 		var offsetString = function(offset) { // e.g. '+2d', '-4w', '+3h +30m'
 			offset = offset.toLowerCase();
 			var time = new Date();
@@ -358,11 +366,11 @@ $.extend(Countdown.prototype, {
 					case 'w': day += parseInt(matches[1], 10) * 7; break;
 					case 'o':
 						month += parseInt(matches[1], 10); 
-						day = Math.min(day, getDaysInMonth(year, month));
+						day = Math.min(day, $.countdown._getDaysInMonth(year, month));
 						break;
 					case 'y':
 						year += parseInt(matches[1], 10);
-						day = Math.min(day, getDaysInMonth(year, month));
+						day = Math.min(day, $.countdown._getDaysInMonth(year, month));
 						break;
 				}
 				matches = pattern.exec(offset);
@@ -374,6 +382,14 @@ $.extend(Countdown.prototype, {
 			(typeof setting == 'number' ? offsetNumeric(setting) : setting)));
 		if (time) time.setMilliseconds(0);
 		return time;
+	},
+
+	/* Determine the number of days in a month.
+	   @param  year   (number) the year
+	   @param  month  (number) the month
+	   @return  (number) the days in that month */
+	_getDaysInMonth: function(year, month) {
+		return 32 - new Date(year, month, 32).getDate();
 	},
 
 	/* Generate the HTML to display the countdown widget.
@@ -446,11 +462,13 @@ $.extend(Countdown.prototype, {
 			ml: labelFor(M), mn: inst._periods[M], mnn: this._twoDigits(inst._periods[M]),
 			sl: labelFor(S), sn: inst._periods[S], snn: this._twoDigits(inst._periods[S])};
 		var html = layout;
+		// Replace period containers: {p<}...{p>}
 		for (var i = 0; i < 7; i++) {
 			var period = 'yowdhms'.charAt(i);
 			var re = new RegExp('\\{' + period + '<\\}(.*)\\{' + period + '>\\}', 'g');
 			html = html.replace(re, (inst._show[i] ? '$1' : ''));
 		}
+		// Replace period values: {pn}
 		$.each(subs, function(n, v) {
 			var re = new RegExp('\\{' + n + '\\}', 'g');
 			html = html.replace(re, v);
@@ -508,19 +526,42 @@ $.extend(Countdown.prototype, {
 		// Calculate differences by period
 		var periods = [0, 0, 0, 0, 0, 0, 0];
 		if (show[Y] || show[O]) {
-			var months = Math.max(0, (until.getFullYear() - now.getFullYear()) * 12 +
-				until.getMonth() - now.getMonth() + (until.getDate() < now.getDate() ? -1 : 0));
+			// Treat end of months as the same
+			var lastNow = $.countdown._getDaysInMonth(now.getFullYear(), now.getMonth());
+			var lastUntil = $.countdown._getDaysInMonth(until.getFullYear(), until.getMonth());
+			var sameDay = (until.getDate() == now.getDate() ||
+				(until.getDate() >= Math.min(lastNow, lastUntil) &&
+				now.getDate() >= Math.min(lastNow, lastUntil)));
+			var getSecs = function(date) {
+				return (date.getHours() * 60 + date.getMinutes()) * 60 + date.getSeconds();
+			};
+			var months = Math.max(0,
+				(until.getFullYear() - now.getFullYear()) * 12 + until.getMonth() - now.getMonth() +
+				((until.getDate() < now.getDate() && !sameDay) ||
+				(sameDay && getSecs(until) < getSecs(now)) ? -1 : 0));
 			periods[Y] = (show[Y] ? Math.floor(months / 12) : 0);
 			periods[O] = (show[O] ? months - periods[Y] * 12 : 0);
+			// Adjust for months difference and end of month if necessary
+			var adjustDate = function(date, offset, last) {
+				var wasLastDay = (date.getDate() == last);
+				var lastDay = $.countdown._getDaysInMonth(date.getFullYear() + offset * periods[Y],
+					date.getMonth() + offset * periods[O]);
+				if (date.getDate() > lastDay) {
+					date.setDate(lastDay);
+				}
+				date.setFullYear(date.getFullYear() + offset * periods[Y]);
+				date.setMonth(date.getMonth() + offset * periods[O]);
+				if (wasLastDay) {
+					date.setDate(lastDay);
+				}
+				return date;
+			};
 			if (inst._since) {
-				until.setFullYear(until.getFullYear() - periods[Y]);
-				until.setMonth(until.getMonth() - periods[O]);
+				until = adjustDate(until, -1, lastUntil);
 			}
 			else {
-			now = new Date(now.getTime());
-			now.setFullYear(now.getFullYear() + periods[Y]);
-			now.setMonth(now.getMonth() + periods[O]);
-		}
+				now = adjustDate(new Date(now.getTime()), +1, lastNow);
+			}
 		}
 		var diff = Math.floor((until.getTime() - now.getTime()) / 1000);
 		var extractPeriod = function(period, numSecs) {
@@ -536,7 +577,10 @@ $.extend(Countdown.prototype, {
 	}
 });
 
-/* jQuery extend now ignores nulls! */
+/* jQuery extend now ignores nulls!
+   @param  target  (object) the object to update
+   @param  props   (object) the new settings
+   @return  (object) the updated object */
 function extendRemove(target, props) {
 	$.extend(target, props);
 	for (var name in props) {
@@ -547,7 +591,7 @@ function extendRemove(target, props) {
 	return target;
 }
 
-/* Attach the countdown functionality to a jQuery selection.
+/* Process the countdown functionality for a jQuery selection.
    @param  command  (string) the command to run (optional, default 'attach')
    @param  options  (object) the new settings to use for these countdown instances
    @return  (jQuery) for chaining further calls */

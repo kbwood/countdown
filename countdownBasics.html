@@ -4,11 +4,14 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>jQuery Countdown</title>
-<script type="text/javascript" src="jquery-1.3.1.js"></script>
+<script type="text/javascript" src="jquery-1.3.2.js"></script>
 <script type="text/javascript" src="jquery.countdown.js"></script>
 <script type="text/javascript">
 $(function () {
-	$('#defaultCountdown').countdown({until: new Date(2010, 1 - 1, 26)});
+	var austDay = new Date();
+	austDay = new Date(austDay.getFullYear() + 1, 1 - 1, 26);
+	$('#defaultCountdown').countdown({until: austDay});
+	$('#year').text(austDay.getFullYear());
 });
 </script>
 <style type="text/css">
@@ -23,7 +26,7 @@ $(function () {
 	It contains the minimum requirements for using the plugin and
 	can be used as the basis for your own experimentation.</p>
 <p>For more detail see the <a href="http://keith-wood.name/countdownRef.html">documentation reference</a> page.</p>
-<p>Counting down to 26 January 2010.</p>
+<p>Counting down to 26 January <span id="year">2010</span>.</p>
 <div id="defaultCountdown"></div>
 </body>
 </html>

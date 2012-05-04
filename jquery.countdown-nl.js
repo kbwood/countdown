@@ -4,7 +4,7 @@
 (function($) {
 	$.countdown.regional['nl'] = {
 		labels: ['Jaren', 'Maanden', 'Weken', 'Dagen', 'Uren', 'Minuten', 'Seconden'],
-		labels1: ['Jaren', 'Maanden', 'Weken', 'Dagen', 'Uren', 'Minuten', 'Seconden'],
+		labels1: ['Jaar', 'Maand', 'Week', 'Dag', 'Uur', 'Minuut', 'Seconde'],
 		compactLabels: ['j', 'm', 'w', 'd'],
 		timeSeparator: ':', isRTL: false};
 	$.countdown.setDefaults($.countdown.regional['nl']);
