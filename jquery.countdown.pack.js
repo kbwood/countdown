@@ -1,5 +1,5 @@
 /* http://keith-wood.name/countdown.html
-   Countdown for jQuery v1.5.8.
+   Countdown for jQuery v1.5.9.
    Written by Keith Wood (kbwood{at}iinet.com.au) January 2008.
    Dual licensed under the GPL (http://dev.jquery.com/browser/trunk/jquery/GPL-LICENSE.txt) and 
    MIT (http://dev.jquery.com/browser/trunk/jquery/MIT-LICENSE.txt) licenses. 
