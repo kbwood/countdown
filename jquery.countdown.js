@@ -1,5 +1,5 @@
 /* http://keith-wood.name/countdown.html
-   Countdown for jQuery v1.1.1.
+   Countdown for jQuery v1.2.0.
    Written by Keith Wood (kbwood@virginbroadband.com.au) January 2008.
    Dual licensed under the GPL (http://dev.jquery.com/browser/trunk/jquery/GPL-LICENSE.txt) and 
    MIT (http://dev.jquery.com/browser/trunk/jquery/MIT-LICENSE.txt) licenses. 
@@ -81,7 +81,10 @@ $.extend(Countdown.prototype, {
 		if (onTick) {
 			onTick.apply(inst._target[0], [inst._periods]);
 		}
-		if (inst._now.getTime() >= inst._getUntil(inst._now).getTime()) {
+		var since = inst._get('since');
+		var expired = (since ? inst._now.getTime() <= since.getTime() :
+			inst._now.getTime() >= inst._getUntil(inst._now).getTime());
+		if (expired) {
 			if (inst._timer) {
 				var onExpiry = inst._get('onExpiry');
 				if (onExpiry) {
@@ -203,15 +206,26 @@ $.extend(CountdownInstance.prototype, {
 		// Find endpoints
 		this._now = now;
 		this._now.setMilliseconds(0);
-		var until = this._getUntil(this._now);
-		if (this._now.getTime() > until.getTime()) {
+		var until = this._getUntil(now);
+		if (now.getTime() > until.getTime()) {
 			this._now = now = until;
+		}
+		var since = this._get('since');
+		if (since) {
+			since.setMilliseconds(0);
+		}
+		if (since && now.getTime() < since.getTime()) {
+			this._now = now = since;
+		}
+		if (since) {
+			until = now;
+			now = since;
 		}
 		// Calculate differences by period
 		var periods = [0, 0, 0, 0, 0, 0, 0];
 		if (show[Y] || show[O]) {
-			var months = Math.max(0, (until.getFullYear() - this._now.getFullYear()) * 12 +
-				until.getMonth() - this._now.getMonth() + (until.getDate() < this._now.getDate() ? -1 : 0));
+			var months = Math.max(0, (until.getFullYear() - now.getFullYear()) * 12 +
+				until.getMonth() - now.getMonth() + (until.getDate() < now.getDate() ? -1 : 0));
 			periods[Y] = (show[Y] ? Math.floor(months / 12) : 0);
 			periods[O] = (show[O] ? months - periods[Y] * 12 : 0);
 			now = new Date(now.getTime());
@@ -267,7 +281,7 @@ $.fn.countdown = function(options) {
 };
 
 /* Initialise the countdown functionality. */
-$(document).ready(function() {
+$(function() {
    $.countdown = new Countdown(); // singleton instance
 });
 

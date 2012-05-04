@@ -4,6 +4,6 @@
 $(document).ready(function() {
 	$.countdown.regional['hu'] = {
 		labels: ['Év', 'Hónap', 'Hét', 'Nap', 'Óra', 'Perc', 'Másodperc'],
-		compactLabels: ['É', 'H', 'H', 'N'], timeSeparator: ':'};
+		compactLabels: ['É', 'H', 'Hé', 'N'], timeSeparator: ':'};
 	$.countdown.setDefaults($.countdown.regional['hu']);
 });
