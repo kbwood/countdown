@@ -1,5 +1,5 @@
 /* http://keith-wood.name/countdown.html
-   Countdown for jQuery v1.4.0.
+   Countdown for jQuery v1.4.1.
    Written by Keith Wood (kbwood@virginbroadband.com.au) January 2008.
    Dual licensed under the GPL (http://dev.jquery.com/browser/trunk/jquery/GPL-LICENSE.txt) and 
    MIT (http://dev.jquery.com/browser/trunk/jquery/MIT-LICENSE.txt) licenses. 
@@ -322,8 +322,10 @@ $.extend(Countdown.prototype, {
 			'<div class="countdown_row countdown_amount' +
 			(inst._hold ? ' countdown_holding' : '') + '">' + 
 			showCompact(Y) + showCompact(O) + showCompact(W) + showCompact(D) + 
-			twoDigits(periods[H]) + timeSeparator +
-			twoDigits(periods[M]) + (inst._show[S] ? timeSeparator + twoDigits(periods[S]) : '') :
+			(inst._show[H] ? twoDigits(periods[H]) : '') +
+			(inst._show[M] ? (inst._show[H] ? timeSeparator : '') + twoDigits(periods[M]) : '') +
+			(inst._show[S] ? (inst._show[H] || inst._show[M] ? timeSeparator : '') +
+			twoDigits(periods[S]) : '') :
 			// Full version
 			'<div class="countdown_row countdown_show' + showCount +
 			(inst._hold ? ' countdown_holding' : '') + '">' +
