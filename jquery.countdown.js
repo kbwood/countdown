@@ -1,5 +1,5 @@
 /* http://keith-wood.name/countdown.html
-   Countdown for jQuery v1.5.5.
+   Countdown for jQuery v1.5.6.
    Written by Keith Wood (kbwood{at}iinet.com.au) January 2008.
    Dual licensed under the GPL (http://dev.jquery.com/browser/trunk/jquery/GPL-LICENSE.txt) and 
    MIT (http://dev.jquery.com/browser/trunk/jquery/MIT-LICENSE.txt) licenses. 
@@ -110,6 +110,15 @@ $.extend(Countdown.prototype, {
 		return d;
 	},
 
+	/* Convert a set of periods into seconds.
+	   Averaged for months and years.
+	   @param  periods  (number[7]) the periods per year/month/week/day/hour/minute/second
+	   @return  (number) the corresponding number of seconds */
+	periodsToSeconds: function(periods) {
+		return periods[0] * 31557600 + periods[1] * 2629800 + periods[2] * 604800 +
+			periods[3] * 86400 + periods[4] * 3600 + periods[5] * 60 + periods[6];
+	},
+
 	/* Retrieve one or more settings values.
 	   @param  name  (string, optional) the name of the setting to retrieve
 	                 or 'all' for all instance settings or omit for all default settings
@@ -179,11 +188,12 @@ $.extend(Countdown.prototype, {
 		$target[(this._get(inst, 'isRTL') ? 'add' : 'remove') + 'Class']('countdown_rtl');
 		var onTick = this._get(inst, 'onTick');
 		if (onTick) {
-			onTick.apply(target, [inst._hold != 'lap' ? inst._periods :
-				this._calculatePeriods(inst, inst._show, new Date())]);
+			var periods = inst._hold != 'lap' ? inst._periods :
+				this._calculatePeriods(inst, inst._show, new Date());
+			onTick.apply(target, [periods]);
 		}
 		var expired = inst._hold != 'pause' &&
-			(inst._since ? inst._now.getTime() <= inst._since.getTime() :
+			(inst._since ? inst._now.getTime() < inst._since.getTime() :
 			inst._now.getTime() >= inst._until.getTime());
 		if (expired && !inst._expiring) {
 			inst._expiring = true;
@@ -271,7 +281,7 @@ $.extend(Countdown.prototype, {
 		var timezone = this._get(inst, 'timezone');
 		timezone = (timezone == null ? -now.getTimezoneOffset() : timezone);
 		inst._since = this._get(inst, 'since');
-		if (inst._since) {
+		if (inst._since != null) {
 			inst._since = this.UTCDate(timezone, this._determineTime(inst._since, null));
 			if (inst._since && serverSync) {
 				inst._since.setMilliseconds(inst._since.getMilliseconds() +
@@ -426,10 +436,11 @@ $.extend(Countdown.prototype, {
 		// Show all 'asNeeded' after first non-zero value
 		var shownNonZero = false;
 		var showCount = 0;
+		var show = $.extend({}, inst._show);
 		for (var period = 0; period < inst._show.length; period++) {
 			shownNonZero |= (inst._show[period] == '?' && periods[period] > 0);
-			inst._show[period] = (inst._show[period] == '?' && !shownNonZero ? null : inst._show[period]);
-			showCount += (inst._show[period] ? 1 : 0);
+			show[period] = (inst._show[period] == '?' && !shownNonZero ? null : inst._show[period]);
+			showCount += (show[period] ? 1 : 0);
 		}
 		var compact = this._get(inst, 'compact');
 		var layout = this._get(inst, 'layout');
@@ -438,25 +449,25 @@ $.extend(Countdown.prototype, {
 		var description = this._get(inst, 'description') || '';
 		var showCompact = function(period) {
 			var labelsNum = $.countdown._get(inst, 'compactLabels' + periods[period]);
-			return (inst._show[period] ? periods[period] +
+			return (show[period] ? periods[period] +
 				(labelsNum ? labelsNum[period] : labels[period]) + ' ' : '');
 		};
 		var showFull = function(period) {
 			var labelsNum = $.countdown._get(inst, 'labels' + periods[period]);
-			return (inst._show[period] ?
+			return (show[period] ?
 				'<span class="countdown_section"><span class="countdown_amount">' +
 				periods[period] + '</span><br/>' +
 				(labelsNum ? labelsNum[period] : labels[period]) + '</span>' : '');
 		};
-		return (layout ? this._buildLayout(inst, layout, compact) :
+		return (layout ? this._buildLayout(inst, show, layout, compact) :
 			((compact ? // Compact version
 			'<span class="countdown_row countdown_amount' +
 			(inst._hold ? ' countdown_holding' : '') + '">' + 
 			showCompact(Y) + showCompact(O) + showCompact(W) + showCompact(D) + 
-			(inst._show[H] ? this._minDigits(periods[H], 2) : '') +
-			(inst._show[M] ? (inst._show[H] ? timeSeparator : '') +
+			(show[H] ? this._minDigits(periods[H], 2) : '') +
+			(show[M] ? (show[H] ? timeSeparator : '') +
 			this._minDigits(periods[M], 2) : '') +
-			(inst._show[S] ? (inst._show[H] || inst._show[M] ? timeSeparator : '') +
+			(show[S] ? (show[H] || show[M] ? timeSeparator : '') +
 			this._minDigits(periods[S], 2) : '') :
 			// Full version
 			'<span class="countdown_row countdown_show' + showCount +
@@ -468,10 +479,11 @@ $.extend(Countdown.prototype, {
 
 	/* Construct a custom layout.
 	   @param  inst     (object) the current settings for this instance
+	   @param  show     (string[7]) flags indicating which periods are requested
 	   @param  layout   (string) the customised layout
 	   @param  compact  (boolean) true if using compact labels
 	   @return  (string) the custom HTML */
-	_buildLayout: function(inst, layout, compact) {
+	_buildLayout: function(inst, show, layout, compact) {
 		var labels = this._get(inst, (compact ? 'compactLabels' : 'labels'));
 		var labelFor = function(index) {
 			return ($.countdown._get(inst,
@@ -515,7 +527,7 @@ $.extend(Countdown.prototype, {
 		for (var i = 0; i < 7; i++) {
 			var period = 'yowdhms'.charAt(i);
 			var re = new RegExp('\\{' + period + '<\\}(.*)\\{' + period + '>\\}', 'g');
-			html = html.replace(re, (inst._show[i] ? '$1' : ''));
+			html = html.replace(re, (show[i] ? '$1' : ''));
 		}
 		// Replace period values: {pn}
 		$.each(subs, function(n, v) {
