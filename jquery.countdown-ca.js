@@ -6,6 +6,7 @@
 		labels: ['Anys', 'Mesos', 'Setmanes', 'Dies', 'Hores', 'Minuts', 'Segons'],
 		labels1: ['Anys', 'Mesos', 'Setmanes', 'Dies', 'Hores', 'Minuts', 'Segons'],
 		compactLabels: ['a', 'm', 's', 'g'],
+		whichLabels: null,
 		timeSeparator: ':', isRTL: false};
 	$.countdown.setDefaults($.countdown.regional['ca']);
 })(jQuery);

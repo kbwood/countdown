@@ -6,6 +6,7 @@
 		labels: ['tahun', 'bulan', 'minggu', 'hari', 'jam', 'menit', 'detik'],
 		labels1: ['tahun', 'bulan', 'minggu', 'hari', 'jam', 'menit', 'detik'],
 		compactLabels: ['t', 'b', 'm', 'h'],
+		whichLabels: null,
 		timeSeparator: ':', isRTL: false};
 	$.countdown.setDefaults($.countdown.regional['id']);
 })(jQuery);

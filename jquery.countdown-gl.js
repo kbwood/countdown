@@ -6,6 +6,7 @@
 		labels: ['Anos', 'Meses', 'Semanas', 'Días', 'Horas', 'Minutos', 'Segundos'],
 		labels1: ['Anos', 'Meses', 'Semanas', 'Días', 'Horas', 'Minutos', 'Segundos'],
 		compactLabels: ['a', 'm', 's', 'g'],
+		whichLabels: null,
 		timeSeparator: ':', isRTL: false};
 	$.countdown.setDefaults($.countdown.regional['gl']);
 })(jQuery);

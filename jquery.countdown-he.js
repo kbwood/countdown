@@ -6,6 +6,7 @@
 		labels: ['שנים', 'חודשים', 'שבועות', 'ימים', 'שעות', 'דקות', 'שניות'],
 		labels1: ['שנה', 'חודש', 'שבוע', 'יום', 'שעה', 'דקה', 'שנייה'],
 		compactLabels: ['שנ', 'ח', 'שב', 'י'],
+		whichLabels: null,
 		timeSeparator: ':', isRTL: true};
 	$.countdown.setDefaults($.countdown.regional['he']);
 })(jQuery);

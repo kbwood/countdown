@@ -6,6 +6,7 @@
 		labels: ['Év', 'Hónap', 'Hét', 'Nap', 'Óra', 'Perc', 'Másodperc'],
 		labels1: ['Év', 'Hónap', 'Hét', 'Nap', 'Óra', 'Perc', 'Másodperc'],
 		compactLabels: ['É', 'H', 'Hé', 'N'],
+		whichLabels: null,
 		timeSeparator: ':', isRTL: false};
 	$.countdown.setDefaults($.countdown.regional['hu']);
 })(jQuery);

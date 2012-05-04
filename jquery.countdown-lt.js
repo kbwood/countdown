@@ -6,6 +6,7 @@
 		labels: ['Metų', 'Mėnesių', 'Savaičių', 'Dienų', 'Valandų', 'Minučių', 'Sekundžių'],
 		labels1: ['Metai', 'Mėnuo', 'Savaitė', 'Diena', 'Valanda', 'Minutė', 'Sekundė'],
 		compactLabels: ['m', 'm', 's', 'd'],
+		whichLabels: null,
 		timeSeparator: ':', isRTL: false};
 	$.countdown.setDefaults($.countdown.regional['lt']);
 })(jQuery);

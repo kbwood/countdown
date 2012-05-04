@@ -7,6 +7,7 @@
 		labels1: ['년', '월', '주', '일', '시', '분', '초'],
 		compactLabels: ['년', '월', '주', '일'],
 		compactLabels1: ['년', '월', '주', '일'],
+		whichLabels: null,
 		timeSeparator: ':', isRTL: false};
 	$.countdown.setDefaults($.countdown.regional['ko']);
 })(jQuery);

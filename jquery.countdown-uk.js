@@ -6,6 +6,7 @@
 		labels: ['Років', 'Місяців', 'Тижднів', 'Днів', 'Годин', 'Хвилин', 'Секунд'],
 		labels1: ['Рік', 'Місяць', 'Тиждень', 'День', 'Година', 'Хвилина', 'Секунда'],
 		compactLabels: ['r', 'm', 't', 'd'],
+		whichLabels: null,
 		timeSeparator: ':', isRTL: false};
 	$.countdown.setDefaults($.countdown.regional['uk']);
 })(jQuery);

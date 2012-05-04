@@ -6,6 +6,7 @@
 		labels: ['Yıl', 'Ay', 'Hafta', 'Gün', 'Saat', 'Dakika', 'Saniye'],
 		labels1: ['Yıl', 'Ay', 'Hafta', 'Gün', 'Saat', 'Dakika', 'Saniye'],
 		compactLabels: ['y', 'a', 'h', 'g'],
+		whichLabels: null,
 		timeSeparator: ':', isRTL: false};
 	$.countdown.setDefaults($.countdown.regional['tr']);
 })(jQuery);

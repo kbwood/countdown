@@ -6,6 +6,7 @@
 		labels: ['ปี', 'เดือน', 'สัปดาห์', 'วัน', 'ชั่วโมง', 'นาที', 'วินาที'],
 		labels1: ['ปี', 'เดือน', 'สัปดาห์', 'วัน', 'ชั่วโมง', 'นาที', 'วินาที'],
 		compactLabels: ['ปี', 'เดือน', 'สัปดาห์', 'วัน'],
+		whichLabels: null,
 		timeSeparator: ':', isRTL: false};
 	$.countdown.setDefaults($.countdown.regional['th']);
 })(jQuery);

@@ -6,6 +6,7 @@
 		labels: ['Vuotta', 'Kuukautta', 'Viikkoa', 'Päivää', 'Tuntia', 'Minuuttia', 'Sekuntia'],
 		labels1: ['Vuosi', 'Kuukausi', 'Viikko', 'Päivä', 'Tunti', 'Minuutti', 'Sekunti'],
 		compactLabels: ['v', 'kk', 'vk', 'pv'],
+		whichLabels: null,
 		timeSeparator: ':', isRTL: false};
 	$.countdown.setDefaults($.countdown.regional['fi']);
 })(jQuery);

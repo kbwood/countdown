@@ -6,6 +6,7 @@
 		labels: ['År', 'Måneder', 'Uger', 'Dage', 'Timer', 'Minutter', 'Sekunder'],
 		labels1: ['År', 'Månad', 'Uge', 'Dag', 'Time', 'Minut', 'Sekund'],
 		compactLabels: ['Å', 'M', 'U', 'D'],
+		whichLabels: null,
 		timeSeparator: ':', isRTL: false};
 	$.countdown.setDefaults($.countdown.regional['da']);
 })(jQuery);

@@ -6,6 +6,7 @@
 		labels: ['Ani', 'Luni', 'Saptamani', 'Zile', 'Ore', 'Minute', 'Secunde'],
 		labels1: ['An', 'Luna', 'Saptamana', 'Ziua', 'Ora', 'Minutul', 'Secunda'],
 		compactLabels: ['A', 'L', 'S', 'Z'],
+		whichLabels: null,
 		timeSeparator: ':', isRTL: false};
 	$.countdown.setDefaults($.countdown.regional['ro']);
 })(jQuery);
