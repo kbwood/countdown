@@ -1,5 +1,5 @@
 /* http://keith-wood.name/countdown.html
-   Countdown for jQuery v1.5.0.
+   Countdown for jQuery v1.5.1.
    Written by Keith Wood (kbwood{at}iinet.com.au) January 2008.
    Dual licensed under the GPL (http://dev.jquery.com/browser/trunk/jquery/GPL-LICENSE.txt) and 
    MIT (http://dev.jquery.com/browser/trunk/jquery/MIT-LICENSE.txt) licenses. 
@@ -25,6 +25,14 @@ function Countdown() {
 		isRTL: false // True for right-to-left languages, false for left-to-right
 	};
 	this._defaults = {
+		until: null, // new Date(year, mth - 1, day, hr, min, sec) - date/time to count down to
+			// or numeric for seconds offset, or string for unit offset(s):
+			// 'Y' years, 'O' months, 'W' weeks, 'D' days, 'H' hours, 'M' minutes, 'S' seconds
+		since: null, // new Date(year, mth - 1, day, hr, min, sec) - date/time to count up to
+			// or numeric for seconds offset, or string for unit offset(s):
+			// 'Y' years, 'O' months, 'W' weeks, 'D' days, 'H' hours, 'M' minutes, 'S' seconds
+		timezone: null, // The timezone (hours or minutes from GMT) for the target times,
+			// or null for client local
 		format: 'dHMS', // Format for display - upper case for always, lower case only if non-zero,
 			// 'Y' years, 'O' months, 'W' weeks, 'D' days, 'H' hours, 'M' minutes, 'S' seconds
 		layout: '', // Build your own layout for the countdown
@@ -34,10 +42,9 @@ function Countdown() {
 		alwaysExpire: false, // True to trigger onExpiry even if never counted down
 		onExpiry: null, // Callback when the countdown expires -
 			// receives no parameters and 'this' is the containing division
-		onTick: null, // Callback when the countdown is updated -
+		onTick: null // Callback when the countdown is updated -
 			// receives int[7] being the breakdown by period (based on format)
 			// and 'this' is the containing division
-		serverTime: null // The current time on the server, to calculate an offset for other time zones
 	};
 	$.extend(this._defaults, this.regional['']);
 }
@@ -68,6 +75,38 @@ $.extend(Countdown.prototype, {
 		extendRemove(this._defaults, options || {});
 	},
 
+	/* Convert a date/time to UTC.
+	   @param  tz     (number) the hour or minute offset from GMT, e.g. +9, -360
+	   @param  year   (Date) the date/time in that timezone or
+	                  (number) the year in that timezone
+	   @param  month  (number, optional) the month (0 - 11) (omit if year is a Date)
+	   @param  day    (number, optional) the day (omit if year is a Date)
+	   @param  hours  (number, optional) the hour (omit if year is a Date)
+	   @param  mins   (number, optional) the minute (omit if year is a Date)
+	   @param  secs   (number, optional) the second (omit if year is a Date)
+	   @param  ms     (number, optional) the millisecond (omit if year is a Date)
+	   @return  (Date) the equivalent UTC date/time */
+	UTCDate: function(tz, year, month, day, hours, mins, secs, ms) {
+		if (typeof year == 'object' && year.constructor == Date) {
+			ms = year.getMilliseconds();
+			secs = year.getSeconds();
+			mins = year.getMinutes();
+			hours = year.getHours();
+			day = year.getDate();
+			month = year.getMonth();
+			year = year.getFullYear();
+		}
+		var d = new Date();
+		d.setUTCFullYear(year);
+		d.setUTCMonth(month || 0);
+		d.setUTCDate(day || 1);
+		d.setUTCHours(hours || 0);
+		d.setUTCMinutes((mins || 0) - (Math.abs(tz) < 30 ? tz * 60 : tz));
+		d.setUTCSeconds(secs || 0);
+		d.setUTCMilliseconds(ms || 0);
+		return d;
+	},
+
 	/* Attach the countdown widget to a div.
 	   @param  target   (element) the containing division
 	   @param  options  (object) the initial settings for the countdown */
@@ -77,17 +116,10 @@ $.extend(Countdown.prototype, {
 			return;
 		}
 		$target.addClass(this.markerClassName);
-		var inst = {};
-		inst.options = $.extend({}, options);
-		inst._periods = [0, 0, 0, 0, 0, 0, 0];
-		this._adjustSettings(inst);
+		var inst = {options: $.extend({}, options),
+			_periods: [0, 0, 0, 0, 0, 0, 0]};
 		$.data(target, PROP_NAME, inst);
-		var now = new Date();
-		if ((inst._since && inst._since < now) ||
-				(inst._until && inst._until > now)) {
-			this._addTarget(target);
-		}
-		this._updateCountdown(target, inst);
+		this._changeCountdown(target);
 	},
 
 	/* Add a target to the list of active ones.
@@ -161,8 +193,10 @@ $.extend(Countdown.prototype, {
 	   @param  target   (element) the containing division
 	   @param  options  (object) the new settings for the countdown or
 	                    (string) an individual property name
-	   @param  value    (any) the individual property value (omit if options is an object) */
+	   @param  value    (any) the individual property value
+	                    (omit if options is an object) */
 	_changeCountdown: function(target, options, value) {
+		options = options || {};
 		if (typeof options == 'string') {
 			var name = options;
 			options = {};
@@ -171,12 +205,12 @@ $.extend(Countdown.prototype, {
 		var inst = $.data(target, PROP_NAME);
 		if (inst) {
 			this._resetExtraLabels(inst.options, options);
-			extendRemove(inst.options, options || {});
+			extendRemove(inst.options, options);
 			this._adjustSettings(inst);
 			$.data(target, PROP_NAME, inst);
 			var now = new Date();
-			if ((options.since && options.since < now) ||
-					(options.until && options.until > now)) {
+			if ((inst._since && inst._since < now) ||
+					(inst._until && inst._until > now)) {
 				this._addTarget(target);
 			}
 			this._updateCountdown(target, inst);
@@ -280,13 +314,13 @@ $.extend(Countdown.prototype, {
 	   @param  inst  (object) the current settings for this instance */
 	_adjustSettings: function(inst) {
 		var now = new Date();
-		var serverTime = this._get(inst, 'serverTime');
-		inst._offset = (serverTime ? serverTime.getTime() - now.getTime() : 0);
+		var timezone = this._get(inst, 'timezone');
+		timezone = (timezone == null ? -new Date().getTimezoneOffset() : timezone);
 		inst._since = this._get(inst, 'since');
 		if (inst._since) {
-			inst._since = this._determineTime(inst._since, null);
+			inst._since = this.UTCDate(timezone, this._determineTime(inst._since, null));
 		}
-		inst._until = this._determineTime(this._get(inst, 'until'), now);
+		inst._until = this.UTCDate(timezone, this._determineTime(this._get(inst, 'until'), now));
 		inst._show = this._determineShow(inst);
 	},
 
@@ -469,9 +503,8 @@ $.extend(Countdown.prototype, {
 			until.setTime(inst._until.getTime());
 			if (now.getTime() > inst._until.getTime()) {
 				inst._now = now = until;
+			}
 		}
-		}
-		until.setTime(until.getTime() - inst._offset); // Adjust for time zone
 		// Calculate differences by period
 		var periods = [0, 0, 0, 0, 0, 0, 0];
 		if (show[Y] || show[O]) {
