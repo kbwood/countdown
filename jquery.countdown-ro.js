@@ -7,6 +7,7 @@
 		labels1: ['An', 'Luna', 'Saptamana', 'Ziua', 'Ora', 'Minutul', 'Secunda'],
 		compactLabels: ['A', 'L', 'S', 'Z'],
 		whichLabels: null,
+		digits: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'],
 		timeSeparator: ':', isRTL: false};
 	$.countdown.setDefaults($.countdown.regional['ro']);
 })(jQuery);

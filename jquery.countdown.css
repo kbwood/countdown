@@ -1,4 +1,4 @@
-/* jQuery Countdown styles 1.5.11. */
+/* jQuery Countdown styles 1.6.0. */
 .hasCountdown {
 	border: 1px solid #ccc;
 	background-color: #eee;
@@ -7,7 +7,7 @@
 	direction: rtl;
 }
 .countdown_holding span {
-	background-color: #ccc;
+	color: #888;
 }
 .countdown_row {
 	clear: both;

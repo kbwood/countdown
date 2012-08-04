@@ -1,3 +1,4 @@
+		digits: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'],
 /* http://keith-wood.name/countdown.html
    Korean initialisation for the jQuery countdown extension
    Written by Ryan Yu (ryanyu79@gmail.com). */

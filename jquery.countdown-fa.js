@@ -7,6 +7,7 @@
 		labels1: ['سال', 'ماه', 'هفته', 'روز', 'ساعت', 'دقیقه', 'ثانیه'],
 		compactLabels: ['س', 'م', 'ه', 'ر'],
 		whichLabels: null,
+		digits: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'],
 		timeSeparator: ':', isRTL: true};
 	$.countdown.setDefaults($.countdown.regional['fa']);
 })(jQuery);

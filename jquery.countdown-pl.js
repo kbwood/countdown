@@ -12,6 +12,7 @@
 			var tens = Math.floor((amount % 100) / 10);
 			return (amount == 1 ? 1 : (units >= 2 && units <= 4 && tens != 1 ? 2 : 0));
 		},
+		digits: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'],
 		timeSeparator: ':', isRTL: false};
 	$.countdown.setDefaults($.countdown.regional['pl']);
 })(jQuery);

@@ -7,6 +7,7 @@
 		labels1: ['Anos', 'Meses', 'Semanas', 'Días', 'Horas', 'Minutos', 'Segundos'],
 		compactLabels: ['a', 'm', 's', 'g'],
 		whichLabels: null,
+		digits: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'],
 		timeSeparator: ':', isRTL: false};
 	$.countdown.setDefaults($.countdown.regional['gl']);
 })(jQuery);
