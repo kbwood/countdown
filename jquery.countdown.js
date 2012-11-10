@@ -56,7 +56,17 @@ function Countdown() {
 	this._serverSyncs = [];
 	// Shared timer for all countdowns
 	function timerCallBack(timestamp) {
-		var drawStart = (timestamp || new Date().getTime());
+		var drawStart;
+	            if (timestamp < 1e12) {
+	                // .. new html5 high resolution timer
+	                drawStart = window.performance.now ?
+	                        (performance.now() + performance.timing.navigationStart) :
+	                        Date.now();
+	            } else {
+	                // integer milliseconds since unix epoch
+	                drawStart = (timestamp || new Date().getTime());
+	            }
+
 		if (drawStart - animationStartTime >= 1000) {
 			plugin._updateTargets();
 			animationStartTime = drawStart;
