@@ -1,7 +1,7 @@
 ﻿/* http://keith-wood.name/countdown.html
    Persian (فارسی) initialisation for the jQuery countdown extension
    Written by Alireza Ziaie (ziai@magfa.com) Oct 2008.
-   Digits corrected by Hamed Ramezanian Feb 2013. */
+   digits corrected by Hamed Ramezanian Feb 2013. */
 (function($) {
 	$.countdown.regional['fa'] = {
 		labels: ['‌سال', 'ماه', 'هفته', 'روز', 'ساعت', 'دقیقه', 'ثانیه'],
