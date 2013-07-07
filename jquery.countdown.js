@@ -49,8 +49,15 @@ function Countdown() {
 		onTick: null, // Callback when the countdown is updated -
 			// receives int[7] being the breakdown by period (based on format)
 			// and 'this' is the containing division
-		tickInterval: 1 // Interval (seconds) between onTick callbacks
+		tickInterval: 1, // Interval (seconds) between onTick callbacks
+		template_period: '<span class="%section%"><span class="%amount%">' +
+			'%period%<br />%period_label%</span></span>',
+			// Allows for period element to have a different style
+		template_list: '<span class="%row%">%periods%</span>%description%',
+			// Allows for period element to have a different style
+		template_desc: '<span class="%row%">%desc%</span>'
 	};
+
 	$.extend(this._defaults, this.regional['']);
 	this._serverSyncs = [];
 	// Shared timer for all countdowns
@@ -519,31 +526,42 @@ $.extend(Countdown.prototype, {
 		};
 		var showFull = function(period) {
 			var labelsNum = inst.options['labels' + whichLabels(inst._periods[period])];
+
+			var rend_template = inst.options.template_period
+				.replace('%section%', plugin._sectionClass)
+				.replace('%amount%', plugin._amountClass)
+				.replace('%period%', self._translateDigits(inst, inst._periods[period]))
+				.replace('%period_label%', (labelsNum ? labelsNum[period] : labels[period]));
+
 			return ((!inst.options.significant && show[period]) ||
 				(inst.options.significant && showSignificant[period]) ?
-				'<span class="' + plugin._sectionClass + '">' +
-				'<span class="' + plugin._amountClass + '">' +
-				self._translateDigits(inst, inst._periods[period]) + '</span><br/>' +
-				(labelsNum ? labelsNum[period] : labels[period]) + '</span>' : '');
+				rend_template : '');
 		};
 		return (inst.options.layout ? this._buildLayout(inst, show, inst.options.layout,
 			inst.options.compact, inst.options.significant, showSignificant) :
 			((inst.options.compact ? // Compact version
-			'<span class="' + this._rowClass + ' ' + this._amountClass +
-			(inst._hold ? ' ' + this._holdingClass : '') + '">' + 
-			showCompact(Y) + showCompact(O) + showCompact(W) + showCompact(D) + 
+			inst.options.template_list.replace('%row%', this._rowClass + ' ' + this._amountClass +
+			(inst._hold ? ' ' + this._holdingClass : ''))
+			.replace('%periods%', showCompact(Y) + showCompact(O) + showCompact(W) + showCompact(D) + 
 			(show[H] ? this._minDigits(inst, inst._periods[H], 2) : '') +
 			(show[M] ? (show[H] ? inst.options.timeSeparator : '') +
 			this._minDigits(inst, inst._periods[M], 2) : '') +
 			(show[S] ? (show[H] || show[M] ? inst.options.timeSeparator : '') +
-			this._minDigits(inst, inst._periods[S], 2) : '') :
+			this._minDigits(inst, inst._periods[S], 2) : ''))
+			.replace('%description%', ''):
 			// Full version
-			'<span class="' + this._rowClass + ' ' + this._showClass + (inst.options.significant || showCount) +
-			(inst._hold ? ' ' + this._holdingClass : '') + '">' +
-			showFull(Y) + showFull(O) + showFull(W) + showFull(D) +
-			showFull(H) + showFull(M) + showFull(S)) + '</span>' +
-			(inst.options.description ? '<span class="' + this._rowClass + ' ' + this._descrClass + '">' +
-			inst.options.description + '</span>' : '')));
+			inst.options.template_list.replace('%row%', this._rowClass + ' ' + this._showClass + (inst.options.significant || showCount) +
+			(inst._hold ? ' ' + this._holdingClass : ''))
+				.replace('%periods%', showFull(Y) + showFull(O) + showFull(W) + showFull(D) +
+					showFull(H) + showFull(M) + showFull(S)))
+				.replace('%description%', inst.options.description ? 
+					// desc
+					inst.options.template_desc.replace('%row%', this._rowClass + ' ' + this._descrClass)
+						.replace('%desc%', inst.options.description)
+					: ''
+				)
+			)
+		);
 	},
 
 	/* Construct a custom layout.
