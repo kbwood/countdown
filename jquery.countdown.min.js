@@ -1,5 +1,5 @@
 /* http://keith-wood.name/countdown.html
-   Countdown for jQuery v1.6.2.
+   Countdown for jQuery v1.6.3.
    Written by Keith Wood (kbwood{at}iinet.com.au) January 2008.
    Available under the MIT (https://github.com/jquery/jquery/blob/master/MIT-LICENSE.txt) license. 
    Please attribute the author if you use it. */

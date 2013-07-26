@@ -1,0 +1,15 @@
+{
+  "name": "jquery.countdown",
+  "version": "1.6.3",
+  "main": "jquery.countdown.js",
+  "ignore": [
+    "*.css",
+    "*.gif",
+    "*.html",
+    "*.json",
+    "*.md",
+    "*.png",
+    "jquery.countdown-*.js",
+    "jquery.countdown.min.js"
+  ]
+}
