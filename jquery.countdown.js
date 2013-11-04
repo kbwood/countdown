@@ -388,6 +388,34 @@ $.extend(Countdown.prototype, {
 		this._hold(target, null);
 	},
 
+	/* Toggles a countdown widget between 'pause' and 'resume'.
+	   @param  target  (element) the containing division */
+	_togglePlugin: function(target) {
+		var inst = $.data(target, this.propertyName);
+		if (inst) {
+			if (inst._hold == 'pause') {
+				this._resumePlugin(target);
+			}
+			else {
+				this._pausePlugin(target);
+			}
+		}
+	},
+
+	/* Toggles a countdown widget between 'lap' and 'resume'.
+	   @param  target  (element) the containing division */
+	_lapTogglePlugin: function(target) {
+		var inst = $.data(target, this.propertyName);
+		if (inst) {
+			if (inst._hold == 'lap') {
+				this._resumePlugin(target);
+			}
+			else {
+				this._lapPlugin(target);
+			}
+		}
+	},
+
 	/* Pause or resume a countdown widget.
 	   @param  target  (element) the containing division
 	   @param  hold    (string) the new hold setting */
