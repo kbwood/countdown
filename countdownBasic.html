@@ -16,6 +16,10 @@ $(function () {
 	$('#defaultCountdown').countdown({until: austDay});
 	$('#year').text(austDay.getFullYear());
 });
+
+function toggle() {
+  $('#defaultCountdown').countdown('toggle');
+}
 </script>
 </head>
 <body>
@@ -27,5 +31,8 @@ $(function () {
 <p>For more detail see the <a href="http://keith-wood.name/countdownRef.html">documentation reference</a> page.</p>
 <p>Counting down to 26 January <span id="year">2010</span>.</p>
 <div id="defaultCountdown"></div>
+<p>
+  <button onClick="toggle();" id='#toggle'>Pause/Resume</button>
+</p>
 </body>
 </html>
