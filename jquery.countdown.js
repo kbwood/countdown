@@ -49,7 +49,8 @@ function Countdown() {
 		onTick: null, // Callback when the countdown is updated -
 			// receives int[7] being the breakdown by period (based on format)
 			// and 'this' is the containing division
-		tickInterval: 1 // Interval (seconds) between onTick callbacks
+		tickInterval: 1, // Interval (seconds) between onTick callbacks
+		infinite: false // True to have timer automatically restart after expiry
 	};
 	$.extend(this._defaults, this.regional['']);
 	this._serverSyncs = [];
@@ -284,6 +285,9 @@ $.extend(Countdown.prototype, {
 				}
 				if (inst.options.expiryUrl) {
 					window.location = inst.options.expiryUrl;
+				}
+				if (inst.options.infinite && typeof inst.options.until == 'string' && inst.options.until.match(/^\+\d/)) {
+					this._optionPlugin(target, 'until', inst.options.until);
 				}
 			}
 			inst._expiring = false;
