@@ -286,7 +286,7 @@ $.extend(Countdown.prototype, {
 				if (inst.options.expiryUrl) {
 					window.location = inst.options.expiryUrl;
 				}
-				if (inst.options.infinite && inst.options.until.match(/^\+\d+$/)) {
+				if (inst.options.infinite && typeof inst.options.until == 'string' && inst.options.until.match(/^\+\d/)) {
 					this._optionPlugin(target, 'until', inst.options.until);
 				}
 			}
