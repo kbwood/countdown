@@ -49,7 +49,8 @@ function Countdown() {
 		onTick: null, // Callback when the countdown is updated -
 			// receives int[7] being the breakdown by period (based on format)
 			// and 'this' is the containing division
-		tickInterval: 1 // Interval (seconds) between onTick callbacks
+		tickInterval: 1, // Interval (seconds) between onTick callbacks
+		sectionSeparator: '<br/>' // Separator for section spans
 	};
 	$.extend(this._defaults, this.regional['']);
 	this._serverSyncs = [];
@@ -528,7 +529,7 @@ $.extend(Countdown.prototype, {
 				(inst.options.significant && showSignificant[period]) ?
 				'<span class="' + plugin._sectionClass + '">' +
 				'<span class="' + plugin._amountClass + '">' +
-				self._translateDigits(inst, inst._periods[period]) + '</span><br/>' +
+				self._translateDigits(inst, inst._periods[period]) + '</span>' + inst.options.sectionSeparator +
 				(labelsNum ? labelsNum[period] : labels[period]) + '</span>' : '');
 		};
 		return (inst.options.layout ? this._buildLayout(inst, show, inst.options.layout,
