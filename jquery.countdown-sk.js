@@ -2,7 +2,7 @@
  * Slovak initialisation for the jQuery countdown extension
  * Written by Roman Chlebec (creamd@c64.sk) (2008) */
 (function($) {
-	$.countdown.regional['sk'] = {
+	$.countdown.regionalOptions['sk'] = {
 		labels: ['Rokov', 'Mesiacov', 'Týždňov', 'Dní', 'Hodín', 'Minút', 'Sekúnd'],
 		labels1: ['Rok', 'Mesiac', 'Týždeň', 'Deň', 'Hodina', 'Minúta', 'Sekunda'],
 		labels2: ['Roky', 'Mesiace', 'Týždne', 'Dni', 'Hodiny', 'Minúty', 'Sekundy'],
@@ -12,5 +12,5 @@
 		},
 		digits: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'],
 		timeSeparator: ':', isRTL: false};
-	$.countdown.setDefaults($.countdown.regional['sk']);
+	$.countdown.setDefaults($.countdown.regionalOptions['sk']);
 })(jQuery);

@@ -7,7 +7,7 @@ This plugin sets a div or span to show a countdown to a given time.
 * Decide which periods to show.
 * Count up from a date/time instead.
 * Cater for timezone differences and synchronise with server time.
-* Over 45 localisations.
+* Over 50 localisations.
 
 Have a look at the plugin Web site, http://keith-wood.name/countdown.html, for demonstrations of its abilities.
 

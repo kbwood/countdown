@@ -2,7 +2,7 @@
  * Polish initialisation for the jQuery countdown extension
  * Written by Pawel Lewtak lewtak@gmail.com (2008) */
 (function($) {
-	$.countdown.regional['pl'] = {
+	$.countdown.regionalOptions['pl'] = {
 		labels: ['lat', 'miesięcy', 'tygodni', 'dni', 'godzin', 'minut', 'sekund'],
 		labels1: ['rok', 'miesiąc', 'tydzień', 'dzień', 'godzina', 'minuta', 'sekunda'],
 		labels2: ['lata', 'miesiące', 'tygodnie', 'dni', 'godziny', 'minuty', 'sekundy'],
@@ -14,5 +14,5 @@
 		},
 		digits: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'],
 		timeSeparator: ':', isRTL: false};
-	$.countdown.setDefaults($.countdown.regional['pl']);
+	$.countdown.setDefaults($.countdown.regionalOptions['pl']);
 })(jQuery);

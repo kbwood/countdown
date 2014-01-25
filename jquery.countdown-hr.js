@@ -2,7 +2,7 @@
  * Croatian Latin initialisation for the jQuery countdown extension
  * Written by Dejan Broz info@hqfactory.com (2011) */
 (function($) {
-	$.countdown.regional['hr'] = {
+	$.countdown.regionalOptions['hr'] = {
 		labels: ['Godina', 'Mjeseci', 'Tjedana', 'Dana', 'Sati', 'Minuta', 'Sekundi'],
 		labels1: ['Godina', 'Mjesec', 'Tjedan', 'Dan', 'Sat', 'Minuta', 'Sekunda'],
 		labels2: ['Godine', 'Mjeseca', 'Tjedna', 'Dana', 'Sata', 'Minute', 'Sekunde'],
@@ -12,5 +12,5 @@
 		},
 		digits: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'],
 		timeSeparator: ':', isRTL: false};
-	$.countdown.setDefaults($.countdown.regional['hr']);
+	$.countdown.setDefaults($.countdown.regionalOptions['hr']);
 })(jQuery);

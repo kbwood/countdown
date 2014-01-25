@@ -2,7 +2,7 @@
  * Serbian Latin initialisation for the jQuery countdown extension
  * Written by Predrag Leka lp@lemurcake.com (2010) */
 (function($) {
-	$.countdown.regional['sr-SR'] = {
+	$.countdown.regionalOptions['sr-SR'] = {
 		labels: ['Godina', 'Meseci', 'Nedelja', 'Dana', 'Časova', 'Minuta', 'Sekundi'],
 		labels1: ['Godina', 'Mesec', 'Nedelja', 'Dan', 'Čas', 'Minut', 'Sekunda'],
 		labels2: ['Godine', 'Meseca', 'Nedelje', 'Dana', 'Časa', 'Minuta', 'Sekunde'],
@@ -12,5 +12,5 @@
 		},
 		digits: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'],
 		timeSeparator: ':', isRTL: false};
-	$.countdown.setDefaults($.countdown.regional['sr-SR']);
+	$.countdown.setDefaults($.countdown.regionalOptions['sr-SR']);
 })(jQuery);
