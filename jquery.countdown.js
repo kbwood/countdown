@@ -357,16 +357,15 @@
 			@param base {object} The options to be updated.
 			@param options {object} The new option values. */
 	_resetExtraLabels: function(base, options) {
-		var changingLabels = false;
 		for (var n in options) {
-			if (n != 'whichLabels' && n.match(/[Ll]abels/)) {
-				changingLabels = true;
-				break;
+			if (n.match(/[Ll]abels[02-9]|compactLabels1/)) {
+				base[n] = options[n];
 			}
 		}
-		if (changingLabels) {
-			for (var n in base) { // Remove custom numbered labels
-				if (n.match(/[Ll]abels[02-9]|compactLabels1/)) {
+		
+		for (var n in base) {
+			if (n.match(/[Ll]abels[02-9]|compactLabels1/)) {
+				if(typeof options[n] == 'undefined') {
 					base[n] = null;
 				}
 			}
