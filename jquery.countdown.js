@@ -1,7 +1,7 @@
 /* http://keith-wood.name/countdown.html
-   Countdown for jQuery v2.0.0.
+   Countdown for jQuery v2.0.1.
    Written by Keith Wood (kbwood{at}iinet.com.au) January 2008.
-   Available under the MIT (https://github.com/jquery/jquery/blob/master/MIT-LICENSE.txt) license. 
+   Available under the MIT (https://github.com/jquery/jquery/blob/master/MIT-LICENSE.txt) license.
    Please attribute the author if you use it. */
 
 (function($) { // Hide scope, no $ conflict
@@ -26,7 +26,7 @@
 		@augments JQPlugin
 		@example $(selector).countdown({until: +300}) */
 	$.JQPlugin.createPlugin({
-	
+
 		/** The name of the plugin. */
 		name: pluginName,
 
@@ -38,7 +38,7 @@
 			Triggered when the countdown is initialised.
 			@callback serverSyncCallback
 			@return {Date} The current date/time on the server as expressed in the local timezone. */
-			
+
 		/** Countdown tick callback.
 			Triggered on every <code>tickInterval</code> ticks of the countdown.
 			@callback tickCallback
@@ -51,7 +51,7 @@
 			@callback whichLabelsCallback
 			@param num {number} The current period value.
 			@return {number} The suffix for the label set to use. */
-			
+
 		/** Default settings for the plugin.
 			@property until {Date|number|string} The date/time to count down to, or number of seconds
 						offset from now, or string of amounts and units for offset(s) from now:
@@ -146,7 +146,7 @@
 				isRTL: false
 			}
 		},
-		
+
 		/** Names of getter methods - those that can't be chained. */
 		_getters: ['getTimes'],
 
@@ -208,7 +208,7 @@
 		requestAnimationFrame(timerCallBack);
 	}
 		},
-	
+
 		/** Convert a date/time to UTC.
 			@param tz {number} The hour or minute offset from GMT, e.g. +9, -360.
 			@param year {Date|number} the date/time in that timezone or the year in that timezone.
@@ -357,22 +357,20 @@
 			@param base {object} The options to be updated.
 			@param options {object} The new option values. */
 	_resetExtraLabels: function(base, options) {
-		var changingLabels = false;
 		for (var n in options) {
-			if (n != 'whichLabels' && n.match(/[Ll]abels/)) {
-				changingLabels = true;
-				break;
+			if (n.match(/[Ll]abels[02-9]|compactLabels1/)) {
+				base[n] = options[n];
 			}
 		}
-		if (changingLabels) {
-			for (var n in base) { // Remove custom numbered labels
-				if (n.match(/[Ll]abels[02-9]|compactLabels1/)) {
+		for (var n in base) {
+			if (n.match(/[Ll]abels[02-9]|compactLabels1/)) {
+				if(typeof options[n] === 'undefined') {
 					base[n] = null;
 				}
 			}
 		}
 	},
-	
+
 		/** Calculate internal settings for an instance.
 			@private
 			@param elem {jQuery} The containing division.
@@ -477,7 +475,7 @@
 				inst[inst._since ? '_since' : '_until'] =
 					this._determineTime(sign + inst._periods[0] + 'y' +
 						sign + inst._periods[1] + 'o' + sign + inst._periods[2] + 'w' +
-						sign + inst._periods[3] + 'd' + sign + inst._periods[4] + 'h' + 
+						sign + inst._periods[3] + 'd' + sign + inst._periods[4] + 'h' +
 						sign + inst._periods[5] + 'm' + sign + inst._periods[6] + 's');
 					this._addElem(elem);
 			}
@@ -529,7 +527,7 @@
 					case 'd': day += parseInt(matches[1], 10); break;
 					case 'w': day += parseInt(matches[1], 10) * 7; break;
 					case 'o':
-						month += parseInt(matches[1], 10); 
+						month += parseInt(matches[1], 10);
 							day = Math.min(day, self._getDaysInMonth(year, month));
 						break;
 					case 'y':
@@ -620,8 +618,8 @@
 			inst.options.compact, inst.options.significant, showSignificant) :
 			((inst.options.compact ? // Compact version
 			'<span class="' + this._rowClass + ' ' + this._amountClass +
-			(inst._hold ? ' ' + this._holdingClass : '') + '">' + 
-			showCompact(Y) + showCompact(O) + showCompact(W) + showCompact(D) + 
+			(inst._hold ? ' ' + this._holdingClass : '') + '">' +
+			showCompact(Y) + showCompact(O) + showCompact(W) + showCompact(D) +
 			(show[H] ? this._minDigits(inst, inst._periods[H], 2) : '') +
 			(show[M] ? (show[H] ? inst.options.timeSeparator : '') +
 			this._minDigits(inst, inst._periods[M], 2) : '') +
@@ -750,7 +748,7 @@
 		show[S] = (format.match('s') ? '?' : (format.match('S') ? '!' : null));
 		return show;
 	},
-	
+
 		/** Calculate the requested periods between now and the target time.
 			@private
 			@param inst {object} The current settings for this instance.
