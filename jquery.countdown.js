@@ -1,7 +1,7 @@
 /* http://keith-wood.name/countdown.html
-   Countdown for jQuery v2.0.1.
+   Countdown for jQuery v2.0.2.
    Written by Keith Wood (kbwood{at}iinet.com.au) January 2008.
-   Available under the MIT (https://github.com/jquery/jquery/blob/master/MIT-LICENSE.txt) license. 
+   Available under the MIT (http://keith-wood.name/licence.html) license. 
    Please attribute the author if you use it. */
 
 (function($) { // Hide scope, no $ conflict
@@ -253,6 +253,40 @@
 				periods[3] * 86400 + periods[4] * 3600 + periods[5] * 60 + periods[6];
 		},
 
+		/** Resynchronise the countdowns with the server.
+			@example $.countdown.resync() */
+		resync: function() {
+			var self = this;
+			$('.' + this._getMarker()).each(function() { // Each countdown
+				var inst = $.data(this, self.name);
+				if (inst.options.serverSync) { // If synced
+					var serverSync = null;
+					for (var i = 0; i < self._serverSyncs.length; i++) {
+						if (self._serverSyncs[i][0] == inst.options.serverSync) { // Find sync details
+							serverSync = self._serverSyncs[i];
+							break;
+						}
+					}
+					if (serverSync[2] == null) { // Recalculate if missing
+						var serverResult = ($.isFunction(inst.options.serverSync) ?
+							inst.options.serverSync.apply(this, []) : null);
+						serverSync[2] =
+							(serverResult ? new Date().getTime() - serverResult.getTime() : 0) - serverSync[1];
+					}
+					if (inst._since) { // Apply difference
+						inst._since.setMilliseconds(inst._since.getMilliseconds() + serverSync[2]);
+					}
+					inst._until.setMilliseconds(inst._until.getMilliseconds() + serverSync[2]);
+				}
+			});
+			for (var i = 0; i < self._serverSyncs.length; i++) { // Update sync details
+				if (self._serverSyncs[i][2] != null) {
+					self._serverSyncs[i][1] += self._serverSyncs[i][2];
+					delete self._serverSyncs[i][2];
+				}
+			}
+		},
+
 		_instSettings: function(elem, options) {
 			return {_periods: [0, 0, 0, 0, 0, 0, 0]};
 		},
@@ -375,8 +409,6 @@
 			@param inst {object} The current settings for this instance.
 			@param recalc {boolean} True if until or since are set. */
 		_adjustSettings: function(elem, inst, recalc) {
-		var now;
-		var serverOffset = 0;
 		var serverEntry = null;
 		for (var i = 0; i < this._serverSyncs.length; i++) {
 			if (this._serverSyncs[i][0] == inst.options.serverSync) {
@@ -385,14 +417,14 @@
 			}
 		}
 		if (serverEntry != null) {
-			serverOffset = (inst.options.serverSync ? serverEntry : 0);
-			now = new Date();
+				var serverOffset = (inst.options.serverSync ? serverEntry : 0);
+				var now = new Date();
 		}
 		else {
 			var serverResult = ($.isFunction(inst.options.serverSync) ?
 					inst.options.serverSync.apply(elem[0], []) : null);
-			now = new Date();
-			serverOffset = (serverResult ? now.getTime() - serverResult.getTime() : 0);
+				var now = new Date();
+				var serverOffset = (serverResult ? now.getTime() - serverResult.getTime() : 0);
 			this._serverSyncs.push([inst.options.serverSync, serverOffset]);
 		}
 		var timezone = inst.options.timezone;
@@ -778,8 +810,8 @@
 		var periods = [0, 0, 0, 0, 0, 0, 0];
 		if (show[Y] || show[O]) {
 			// Treat end of months as the same
-				var lastNow = this._getDaysInMonth(now.getFullYear(), now.getMonth());
-				var lastUntil = this._getDaysInMonth(until.getFullYear(), until.getMonth());
+			var lastNow = this._getDaysInMonth(now.getFullYear(), now.getMonth());
+			var lastUntil = this._getDaysInMonth(until.getFullYear(), until.getMonth());
 			var sameDay = (until.getDate() == now.getDate() ||
 				(until.getDate() >= Math.min(lastNow, lastUntil) &&
 				now.getDate() >= Math.min(lastNow, lastUntil)));
@@ -795,7 +827,7 @@
 			// Adjust for months difference and end of month if necessary
 			now = new Date(now.getTime());
 			var wasLastDay = (now.getDate() == lastNow);
-				var lastDay = this._getDaysInMonth(now.getFullYear() + periods[Y],
+			var lastDay = this._getDaysInMonth(now.getFullYear() + periods[Y],
 				now.getMonth() + periods[O]);
 			if (now.getDate() > lastDay) {
 				now.setDate(lastDay);
