@@ -1,6 +1,18 @@
 ﻿{
   "name": "kbwood_countdown",
-  "version": "2.0.1",
+  "version": "2.0.2",
+  "description": "This plugin sets a div or span to show a countdown to a given time. * Standard or compact formats, or create your own layout. * Decide which periods to show. * Count up from a date/time instead. * Cater for timezone differences and synchronise with server time. * Over 50 localisations.",
+  "keywords": [
+    "countdown",
+    "i18n",
+    "timer",
+    "timezone",
+    "ui"
+  ],
+  "license": "MIT",
+  "authors": [
+    "Keith Wood"
+  ],
   "main": "jquery.countdown.js",
   "ignore": [
     "*.gif",
@@ -10,5 +22,8 @@
     "*.png",
     "jquery.countdown-*.js",
     "jquery.*.min.js"
-  ]
+  ],
+  "dependencies": {
+    "jquery": ">=1.4"
+  }
 }
