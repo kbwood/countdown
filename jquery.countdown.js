@@ -354,9 +354,11 @@
 			if ($.isFunction(inst.options.onTick)) {
 				var periods = inst._hold != 'lap' ? inst._periods :
 					this._calculatePeriods(inst, inst._show, inst.options.significant, new Date());
-				if (inst.options.tickInterval == 1 ||
-						this.periodsToSeconds(periods) % inst.options.tickInterval == 0) {
-					inst.options.onTick.apply(elem[0], [periods]);
+				if ( inst._hold != 'pause' ){
+					if (inst.options.tickInterval == 1 ||
+							this.periodsToSeconds(periods) % inst.options.tickInterval == 0) {
+						inst.options.onTick.apply(elem[0], [periods]);
+					}
 				}
 			}
 			var expired = inst._hold != 'pause' &&
