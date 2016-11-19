@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Global</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Global</h1>
+
+    
+
+
+
+
+<section>
+
+<header>
+    
+        <h2></h2>
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+
+        
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+    
+    </div>
+
+    
+
+    
+
+    
+
+     
+
+    
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Type Definitions</h3>
+
+        
+                
+
+    
+
+    <h4 class="name" id="CountdownExpiryCallback"><span class="type-signature"></span>CountdownExpiryCallback<span class="signature">()</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    Countdown expiry callback.
+			Used with the <a href="module-Countdown.html#~defaultOptions"><code>onExpiry</code></a> option and
+			triggered when the countdown expires.
+</div>
+
+
+
+
+
+
+
+    <h5>This:</h5>
+    <ul><li><code>Element</code></li></ul>
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="jquery.countdown.js.html">jquery.countdown.js</a>, <a href="jquery.countdown.js.html#line35">line 35</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>onExpiry: function() {
+  alert('Done');
+}</code></pre>
+
+
+
+            
+                
+
+    
+
+    <h4 class="name" id="CountdownServerSyncCallback"><span class="type-signature"></span>CountdownServerSyncCallback<span class="signature">()</span><span class="type-signature"> &rarr; {Date}</span></h4>
+
+    
+
+
+
+<div class="description">
+    Countdown server synchronisation callback.
+			Used with the <a href="module-Countdown.html#~defaultOptions"><code>serverSync</code></a> option and
+			triggered when the countdown is initialised.
+</div>
+
+
+
+
+
+
+
+    <h5>This:</h5>
+    <ul><li><code>$.countdown</code></li></ul>
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="jquery.countdown.js.html">jquery.countdown.js</a>, <a href="jquery.countdown.js.html#line45">line 45</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    The current date/time on the server as expressed in the local timezone.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Date</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>serverSync: function() {
+  var time = null;
+  $.ajax({url: 'http://myserver.com/serverTime.php',
+    async: false, dataType: 'text',
+    success: function(text) {
+      time = new Date(text);
+    }, error: function(http, message, exc) {
+      time = new Date();
+  });
+  return time;
+}</code></pre>
+
+
+
+            
+                
+
+    
+
+    <h4 class="name" id="CountdownTickCallback"><span class="type-signature"></span>CountdownTickCallback<span class="signature">(periods)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    Countdown tick callback.
+			Used with the <a href="module-Countdown.html#~defaultOptions"><code>onTick</code></a> option and
+			triggered on every <a href="module-Countdown.html#~defaultOptions"><code>tickInterval</code></a> ticks of the countdown.
+</div>
+
+
+
+
+
+
+
+    <h5>This:</h5>
+    <ul><li><code>Element</code></li></ul>
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>periods</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array.&lt;number></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The breakdown by period (years, months, weeks, days,
+					hours, minutes, seconds) of the time remaining/passed.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="jquery.countdown.js.html">jquery.countdown.js</a>, <a href="jquery.countdown.js.html#line64">line 64</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>onTick: function(periods) {
+  $('#altTime').text(periods[4] + ':' + twoDigits(periods[5]) +
+    ':' + twoDigits(periods[6]));
+}</code></pre>
+
+
+
+            
+                
+
+    
+
+    <h4 class="name" id="CountdownWhichLabelsCallback"><span class="type-signature"></span>CountdownWhichLabelsCallback<span class="signature">(num)</span><span class="type-signature"> &rarr; {number}</span></h4>
+
+    
+
+
+
+<div class="description">
+    Countdown which labels callback.
+			Used with the <a href="module-Countdown.html#~regionalOptions"><code>whichLabels</code></a> option and
+			triggered when the countdown is being display to determine which set of labels
+			(<code>labels</code>, <code>labels1</code>, ...) are to be used for the current period value.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>num</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The current period value.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="jquery.countdown.js.html">jquery.countdown.js</a>, <a href="jquery.countdown.js.html#line77">line 77</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    The suffix for the label set to use, or zero for the default labels.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">number</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>whichLabels: function(num) {
+  return (num === 1 ? 1 : (num >= 2 &amp;&amp; num &lt;= 4 ? 2 : 0));
+}</code></pre>
+
+
+
+            
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-Countdown.html">Countdown</a></li></ul><h3><a href="global.html">Global</a></h3>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.1</a> on Sat Nov 19 2016 20:51:10 GMT+1100 (AUS Eastern Daylight Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

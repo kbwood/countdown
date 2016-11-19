@@ -9,18 +9,12 @@
 		"timezone",
 		"ui"
 	],
-	"version": "2.0.1",
+	"version": "2.1.0",
 	"author": {
 		"name": "Keith Wood",
+		"email": "wood.keith@optusnet.com.au",
 		"url": "http://keith-wood.name/"
 	},
-	"maintainers": [
-		{
-			"name": "Keith Wood",
-			"email": "kbwood@iinet.com.au",
-			"url": "http://keith-wood.name/"
-		}
-	],
 	"licenses": [
 		{
 			"type": "MIT",

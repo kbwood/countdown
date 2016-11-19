@@ -1,0 +1,24 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+<title>jQuery Countdown Tests</title>
+<link rel="stylesheet" href="../src/bower_components/qunit/qunit/qunit.css">
+<link rel="stylesheet" href="../src/css/jquery.countdown.css">
+<script src="../src/bower_components/qunit/qunit/qunit.js"></script>
+<script src="../src/bower_components/sinon/index.js"></script>
+<script src="../src/bower_components/jquery/dist/jquery.min.js"></script>
+<script src="../src/bower_components/kbw-plugin/dist/js/jquery.plugin.min.js"></script>
+<script>
+$.noRequestAnimationFrame = true; // Use setInterval which is faked by Sinon
+</script>
+<script src="../src/js/jquery.countdown.js"></script>
+<script src="js/jquery.countdown.tests.js"></script>
+</head>
+<body>
+<div id="qunit"></div>
+<div id="qunit-fixture">
+	<div id="cd"></div>
+</div>
+</body>
+</html>

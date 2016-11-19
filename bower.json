@@ -1,29 +1,32 @@
-﻿{
-  "name": "kbwood_countdown",
-  "version": "2.0.2",
-  "description": "This plugin sets a div or span to show a countdown to a given time. * Standard or compact formats, or create your own layout. * Decide which periods to show. * Count up from a date/time instead. * Cater for timezone differences and synchronise with server time. * Over 50 localisations.",
-  "keywords": [
-    "countdown",
-    "i18n",
-    "timer",
-    "timezone",
-    "ui"
-  ],
-  "license": "MIT",
-  "authors": [
-    "Keith Wood"
-  ],
-  "main": "jquery.countdown.js",
-  "ignore": [
-    "*.gif",
-    "*.html",
-    "*.json",
-    "*.md",
-    "*.png",
-    "jquery.countdown-*.js",
-    "jquery.*.min.js"
-  ],
-  "dependencies": {
-    "jquery": ">=1.4"
-  }
+{
+	"name": "kbw-countdown",
+	"description": "This plugin sets a div or span to show a countdown to a given time.",
+	"keywords": [
+		"countdown",
+		"jQuery",
+		"localisation",
+		"timer"
+	],
+	"homepage": "https://github.com/kbwood/countdown",
+	"authors": [
+		"Keith Wood <wood.keith@optusnet.com.au> (http://keith-wood.name)"
+	],
+	"licence": "MIT",
+	"main": [
+		"src/css/jquery.countdown.css",
+		"src/js/jquery.countdown.js"
+	],
+	"ignore": [
+		"**/.*",
+		"node_modules",
+		"src/bower_components"
+	],
+	"dependencies": {
+		"jquery": ">=1.12.0",
+		"kbw-plugin": "~1.0.3"
+	},
+	"devDependencies": {
+		"qunit": "~1.23",
+		"sinon": "http://sinonjs.org/releases/sinon-1.17.5.js"
+	}
 }
