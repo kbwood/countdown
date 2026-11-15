@@ -1,6 +1,6 @@
 /* http://keith-wood.name/countdown.html
  * Italian initialisation for the jQuery countdown extension
- * Written by Davide Bellettini and Roberto Chiaveri Feb 2008. */
+ * Written by Daphne Bellettini and Roberto Chiaveri Feb 2008. */
 (function($) {
 	'use strict';
 	$.countdown.regionalOptions.it = {
